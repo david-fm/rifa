@@ -1,3 +1,4 @@
+export const prerender = false
 import type { APIRoute } from "astro";
 import { supabase } from "../../../lib/supabase";
 
@@ -15,7 +16,7 @@ export const POST: APIRoute = async ({ request, redirect }) => {
   if (password !== passwordConfirmation) {
       return new Response("Passwords do not match", { status: 400 });
   }
-  
+
   const { error } = await supabase.auth.signUp({
     email,
     password,
