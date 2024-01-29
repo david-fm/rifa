@@ -1,0 +1,27 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Button from '../components/Button.tsx';
+import Input from '../components/Input';
+---
+
+<Layout title="KingRifa">
+	<main>
+        <form action="">
+            <div class=" h-screen w-full flex flex-col justify-center items-center gap-6">
+                <div class="flex flex-col gap-4">
+                    <Input placeholder='Usuario o correo' type='email' extraClass='rounded-md'/>
+                    <Input placeholder='Contraseña' type='password' extraClass='rounded-md'/>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <p>No tienes una cuenta: <a href="register" class=" text-syracuse-orange">Regístrate</a></p>
+                    <Button type='submit' text='ENTRAR' extraClass='rounded-sm'>
+                </div>
+                
+            </div>
+        </form>
+	</main>
+</Layout>
+
+<script>
+
+</script>
