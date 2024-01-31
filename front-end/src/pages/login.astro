@@ -38,19 +38,10 @@ const form = document.querySelector('form');
 const handleError = (err: any) => {
     const error = document.getElementById('error');
     // if error 500
-    if (err.status === 500 ) {
-        if(error)
-        {
-            error.innerText = 'La contraseña debe tener mayusculas, minusculas, numeros y caracteres especiales (@$!%*?&)';
-            error.classList.remove('hidden');
-        }
-    }
-    if (err.status === 400 ) {
-        if(error)
-        {
-            error.innerText = err.message;
-            error.classList.remove('hidden');
-        }
+    if(error)
+    {
+        error.innerText = 'La contraseña debe tener mayusculas, minusculas, numeros y caracteres especiales (@$!%*?&)';
+        error.classList.remove('hidden');
     }
 }
 form?.addEventListener('submit', async (e) => {

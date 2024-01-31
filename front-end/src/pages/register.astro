@@ -16,17 +16,19 @@ if (accessToken && refreshToken) {
 <Layout title="KingRifa">
 	<main>
         <form action="/api/auth/register" id="form">
-            <div class=" h-screen w-full flex flex-col justify-center items-center gap-6">
-                <div class="flex flex-col gap-4">
-                    <!--<Input name='username' placeholder='Nombre de usuario' extraClass='rounded-md'/>-->
-                    <Input name='email' placeholder='Correo electrónico' type='email' extraClass='rounded-md'/>
-                    <Input name='password' placeholder='Contraseña' type='password' extraClass='rounded-md'/>
-                    <Input name='passwordConfirmation' placeholder='Confirmar contraseña' type='password' extraClass='rounded-md'/>
-                </div>
-                <div class="flex flex-col gap-1">
-                    <p class="hidden text-syracuse-orange" id="error"></p>
-                    <p>Ya tiene una cuenta: <a href="login" class=" text-syracuse-orange">Inicia sesion</a></p>
-                    <Button type='submit' text='REGISTRARSE' extraClass='rounded-sm'>
+            <div class=" h-screen w-full flex  justify-center items-center ">
+                <div class="flex flex-col gap-6 max-w-80">
+                    <div class="flex flex-col gap-4">
+                        <!--<Input name='username' placeholder='Nombre de usuario' extraClass='rounded-md'/>-->
+                        <Input name='email' placeholder='Correo electrónico' type='email' extraClass='rounded-md'/>
+                        <Input name='password' placeholder='Contraseña' type='password' extraClass='rounded-md'/>
+                        <Input name='passwordConfirmation' placeholder='Confirmar contraseña' type='password' extraClass='rounded-md'/>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <p class="hidden text-syracuse-orange text-justify text-xs" id="error"></p>
+                        <p>Ya tiene una cuenta: <a href="login" class=" text-syracuse-orange">Inicia sesion</a></p>
+                        <Button type='submit' text='REGISTRARSE' extraClass='rounded-sm'>
+                    </div>
                 </div>
                 
             </div>
@@ -35,7 +37,7 @@ if (accessToken && refreshToken) {
 </Layout>
 
 <script>
-const handleError = (err: any) => {
+const handleError = async (err: any) => {
     const error = document.getElementById('error');
     console.log(error);
     // if error 500
@@ -47,9 +49,10 @@ const handleError = (err: any) => {
         }
     }
     if (err.status === 400 ) {
+        const text = await err.text();
         if(error)
         {
-            error.innerText = err.message;
+            error.innerText = text;
             error.classList.remove('hidden');
         }
     }
