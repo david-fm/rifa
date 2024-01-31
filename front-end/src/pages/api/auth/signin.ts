@@ -10,22 +10,23 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
   if (!email || !password) {
     return new Response("Email and password are required", { status: 400 });
   }
+  
+  return new Response("DONE");
+  // const { data, error } = await supabase.auth.signInWithPassword({
+  //   email,
+  //   password,
+  // });
 
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
+  // if (error) {
+  //   return new Response(error.message, { status: 500 });
+  // }
 
-  if (error) {
-    return new Response(error.message, { status: 500 });
-  }
-
-  const { access_token, refresh_token } = data.session;
-  cookies.set("sb-access-token", access_token, {
-    path: "/",
-  });
-  cookies.set("sb-refresh-token", refresh_token, {
-    path: "/",
-  });
-  return redirect("/dashboard");
+  // const { access_token, refresh_token } = data.session;
+  // cookies.set("sb-access-token", access_token, {
+  //   path: "/",
+  // });
+  // cookies.set("sb-refresh-token", refresh_token, {
+  //   path: "/",
+  // });
+  // return redirect("/dashboard");
 };
