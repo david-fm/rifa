@@ -36,6 +36,7 @@ if (accessToken && refreshToken) {
 
 <script>
 const handleError = (err: any) => {
+    console.log(err);
     const error = document.getElementById('error');
     // if error 500
     if (err.status === 500) {
@@ -44,6 +45,13 @@ const handleError = (err: any) => {
             error.innerText = 'La contraseña debe tener mayusculas, minusculas, numeros y caracteres especiales (@$!%*?&)';
             error.classList.remove('hidden');
         }
+    }
+}
+
+const handleResponse = (res: any) => {
+    console.log(res);
+    if (res.status === 200) {
+        window.location.href = '/login';
     }
 }
 const form = document.querySelector('form');
@@ -55,7 +63,6 @@ form?.addEventListener('submit', async (e) => {
     const res = await fetch('/api/auth/register', {
         method: 'POST',
         body: formData
-    }).then(data => console.log(data)).
-    catch(err => handleError(err));
+    }).then(data => handleResponse(data)).catch(err => handleError(err));
 });
 </script>
