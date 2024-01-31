@@ -36,8 +36,8 @@ if (accessToken && refreshToken) {
 
 <script>
 const handleError = (err: any) => {
-    console.log(err);
     const error = document.getElementById('error');
+    console.log(error);
     // if error 500
     if (err.status === 500) {
         if(error)
@@ -70,6 +70,12 @@ form?.addEventListener('submit', async (e) => {
     const res = await fetch('/api/auth/register', {
         method: 'POST',
         body: formData
-    }).then(data => handleResponse(data)).catch(err => handleError(err));
+    });
+    if (res.status === 200) {
+        handleResponse(res);
+    }
+    else {
+        handleError(res);
+    }
 });
 </script>

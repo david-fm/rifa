@@ -61,6 +61,10 @@ form?.addEventListener('submit', async (e) => {
     const res = await fetch('/api/auth/signin', {
         method: 'POST',
         body: formData
-    }).then(data => console.log(data)).catch(err =>handleError(err));
+    })
+    if(res.status !== 200) {
+        handleError(res);
+        return;
+    }
 });
 </script>
