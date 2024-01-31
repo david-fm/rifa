@@ -46,6 +46,13 @@ const handleError = (err: any) => {
             error.classList.remove('hidden');
         }
     }
+    if (err.status === 400 ) {
+        if(error)
+        {
+            error.innerText = err.message;
+            error.classList.remove('hidden');
+        }
+    }
 }
 
 const handleResponse = (res: any) => {
