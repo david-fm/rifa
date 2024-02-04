@@ -8,7 +8,7 @@ const accessToken = cookies.get("sb-access-token");
 const refreshToken = cookies.get("sb-refresh-token");
 
 if (!accessToken || !refreshToken) {
-  return redirect("/signin");
+  return redirect("/login");
 }
 
 const { data, error } = await supabase.auth.setSession({
@@ -28,6 +28,17 @@ if (error) {
 }
 
 const email = data?.user?.email;
+
+const campaigns = await fetch("/api/campaigns",
+{
+  credentials: "same-origin",
+});
+// Intentar obtener campañas, si no tienes eres nuevo
+// si eres nuevo, mandarte a crear una campaña
+
+if (campaigns.status === 400) {
+  return redirect("/rifa/crear");
+}
 ---
 <Layout title="dashboard">
   <h1>Welcome {email}</h1>

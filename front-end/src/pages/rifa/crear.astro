@@ -1,0 +1,65 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Input from '../../components/Input';
+import Select from '../../components/Select';
+import Discounts from '../../components/Discounts'
+import Prize from '../../components/Prize';
+import Button from '../../components/Button';
+
+const { cookies, redirect } = Astro;
+
+const accessToken = cookies.get("sb-access-token");
+const refreshToken = cookies.get("sb-refresh-token");
+
+if (!accessToken || !refreshToken) {
+  return redirect("/login");
+}
+//console.log(accessToken, refreshToken);
+---
+<Layout title='KingRifa'>
+    <form action="" class="px-8 pt-4 flex flex-col gap-2" id="crea-rifa">
+        <div>
+            <h2>Información general</h2>
+            <p class="">Información general sobre la campaña</p>
+        </div>
+        <Input placeholder='Nombre de la rifa' name='nombre' />
+        <p class="">Imagen de la campaña</p>
+        <Input name='imagen' type='file' extraClass='bg-white bg-white-smoke drop-shadow-none'/>
+        <Input placeholder='Reglamento de la campaña' name='reglamento' big rows={5} client:load/>
+        <div>
+            <h2>Ranking</h2>
+            <p class="">Información sobre el <b>ranking</b> de la campaña</p>
+        </div>
+        
+        <div class="flex items-center justify-start gap-2">
+            <p class=" shrink-0">¿Esta activo?</p>
+            <Input name='ranking-activo' type='checkbox' />
+        </div>
+        <Input placeholder='Incentivos en el ranking' name='reglamento' big rows={5}  client:load/>
+        <div>
+            <h2>Tickets</h2>
+            <p class="">Información sobre los <b>tickets</b></p>
+        </div>
+        
+
+        <Select form="crea-rifa" name="numero-de-ticket" client:load/>
+
+        <Input placeholder='Precio de los tickets' name='precio-ticket' />
+        <Input placeholder='Maximo número de tickets' name='numero-ticket' />
+        <Input placeholder="Tickets necesarios" name="tickets-necesarios" />
+
+        <div>
+            <h2>Descuentos</h2>
+            <p>Descuentos por cantidad de tickets</p>
+            <Discounts client:idle/>
+        </div>
+        <div>
+            <h2>Premios</h2>
+            <p>Información sobre los premios</p>
+            <Prize client:idle/>
+        </div>
+
+        <Button type="submit" text="Publicar">
+        
+    </form>
+</Layout>

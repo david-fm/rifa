@@ -1,4 +1,3 @@
-export const prerender = false
 import type { APIRoute } from "astro";
 import { supabase } from "../../../lib/supabase";
 
@@ -15,8 +14,8 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
     email,
     password,
   });
-
   if (error) {
+    console.error(email, password, error.message);
     return new Response(error.message, { status: 500 });
   }
 
@@ -25,6 +24,12 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
     path: "/",
   });
   cookies.set("sb-refresh-token", refresh_token, {
+    path: "/",
+  });
+  cookies.set("sb-access-token", "access_token", {
+    path: "/",
+  });
+  cookies.set("sb-refresh-token", "refresh_token", {
     path: "/",
   });
   return redirect("/dashboard");

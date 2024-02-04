@@ -1,0 +1,56 @@
+---
+interface Props{
+    icon: string;
+}
+
+const {cookies} = Astro;
+
+const accessToken = cookies.get("sb-access-token");
+const refreshToken = cookies.get("sb-refresh-token");
+
+const {icon} = Astro.props;
+
+// TODO: change the links depending of the type of user
+---
+
+<header class="max-w-screen-xl mx-auto px-8 pt-4">
+    {
+        accessToken && refreshToken ? 
+        <div class="flex justify-between items-center relative z-50">
+            
+            <a href="/">
+                <img src={"/"+icon} class
+                ="h-12 w-12" alt="Logo" />
+            </a>
+            <img src="/nav.svg" class="h-6 w-6 cursor-pointer" alt="Menu" id="toggler" />
+            
+        </div>
+        <nav class="flex flex-col items-end bg-slate-400 absolute right-0 top-12 w-dvw py-4 px-4 transition-all z-0 opacity-0 ">
+                <a href="/dashboard" class="text-gray-700 hover:text-yellow-50 transition-colors border-b-2">Dashboard</a>
+                <a href="/logout" class="ml-4 text-gray-700 hover:text-yellow-50 transition-colors border-b-2">Logout</a>
+            </nav>
+        :
+        <div class="flex justify-center items-center">
+            <a href="/">
+                <img src={"/"+icon} class="h-12 w-12" alt="Logo" />
+            </a>
+        </div>
+    }
+    
+</header>
+
+<script>
+    const toggler = document.getElementById("toggler");
+    toggler?.addEventListener("click", onToggleMenu);
+
+    function onToggleMenu() {
+        toggler?.getAttribute("src") === "/nav.svg" ? 
+            toggler.setAttribute('src', "/cross.svg") 
+            : 
+            toggler?.setAttribute("src","/nav.svg");
+        const nav = document.querySelector("nav");
+        nav?.classList.toggle("opacity-100");
+        nav?.classList.toggle("translate-y-4");
+        nav?.classList.toggle("z-50");
+    }
+</script>

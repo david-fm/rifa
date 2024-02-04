@@ -17,16 +17,19 @@ if (accessToken && refreshToken) {
 <Layout title="KingRifa">
 	<main>
         <form action="/api/auth/signin">
-            <div class=" h-screen w-full flex flex-col justify-center items-center gap-6">
-                <div class="flex flex-col gap-4">
-                    <Input placeholder='Usuario o correo' type='email' extraClass='rounded-md' name='email'/>
-                    <Input placeholder='Contraseña' type='password' extraClass='rounded-md' name='password'/>
+            <div class=" h-screen w-full flex justify-center items-center">
+                <div class="w-80 flex flex-col justify-center items-center gap-6">
+                    <div class="flex flex-col gap-4">
+                        <Input placeholder='Usuario o correo' type='email' extraClass='rounded-md' name='email'/>
+                        <Input placeholder='Contraseña' type='password' extraClass='rounded-md' name='password'/>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <p class="hidden text-syracuse-orange" id="error"></p>
+                        <p>No tienes una cuenta: <a href="register" class=" text-syracuse-orange">Regístrate</a></p>
+                        <Button type='submit' text='ENTRAR' extraClass='rounded-sm' client:load>
+                    </div>
                 </div>
-                <div class="flex flex-col gap-1">
-                    <p class="hidden text-syracuse-orange" id="error"></p>
-                    <p>No tienes una cuenta: <a href="register" class=" text-syracuse-orange">Regístrate</a></p>
-                    <Button type='submit' text='ENTRAR' extraClass='rounded-sm'>
-                </div>
+                
                 
             </div>
         </form>
