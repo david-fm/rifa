@@ -29,16 +29,13 @@ if (error) {
 
 const email = data?.user?.email;
 
-const campaigns = await fetch("/api/campaigns",
-{
-  credentials: "same-origin",
-});
+// const campaigns = await fetch("/api/rifa/mias");
 // Intentar obtener campañas, si no tienes eres nuevo
 // si eres nuevo, mandarte a crear una campaña
 
-if (campaigns.status === 400) {
-  return redirect("/rifa/crear");
-}
+// if (campaigns.status === 400) {
+//   return redirect("/rifa/crear");
+// }
 ---
 <Layout title="dashboard">
   <h1>Welcome {email}</h1>

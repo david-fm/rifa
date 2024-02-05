@@ -14,6 +14,7 @@ const refreshToken = cookies.get("sb-refresh-token");
 if (!accessToken || !refreshToken) {
   return redirect("/login");
 }
+console.log(accessToken, refreshToken);
 //console.log(accessToken, refreshToken);
 ---
 <Layout title='KingRifa'>
@@ -60,6 +61,5 @@ if (!accessToken || !refreshToken) {
         </div>
 
         <Button type="submit" text="Publicar">
-        
     </form>
 </Layout>

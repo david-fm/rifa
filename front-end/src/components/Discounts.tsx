@@ -9,7 +9,7 @@ interface Props{
 export default function Discounts() {
 
     function setNameChild(references:MutableRef<ComponentChildren>[]){
-        console.log(references)
+        //console.log(references)
         for (let i = 0; i < references.length; i++) {
             if(references[i].current.props?.children){
                 references[i].current.props.children[1].props.name = i + "-" + "cada"
