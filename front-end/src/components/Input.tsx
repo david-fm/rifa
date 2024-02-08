@@ -11,7 +11,7 @@ interface Props{
 }
 
 export default function Input({placeholder, extraClass, type, name, myOnInput, big, rows, cols}: Props) {
-    const classes = ` w-80 bg-silver max-w-sm px-5 py-3 drop-shadow-sm transition-all ${extraClass}`
+    const classes = ` w-80  py-5 bg-silver max-w-sm px-5 drop-shadow-sm transition-all ${extraClass}`
     const textAreaClasses =` w-80 bg-silver max-w-sm px-5 py-3 drop-shadow-sm transition-all resize-none ${extraClass}`
     function specialOnInput(e: Event) {
         resizeTextarea(e);
@@ -24,21 +24,34 @@ export default function Input({placeholder, extraClass, type, name, myOnInput, b
         element.style.height = (element.scrollHeight) + "px";
     }
     return (
-        big?
-        <textarea
-        placeholder={placeholder}
-        class={textAreaClasses}
-        name={name}
-        onInput={(e)=>specialOnInput(e)}
-        rows={rows}
-        cols={cols}
-        ></textarea>
-        :
+        (type==="file"?
+        <>
+        <label for="file-input" class={classes}>{placeholder}</label>
         <input 
-        type={type?type:"text"}  
-        placeholder={placeholder}  
-        class={classes}
-        name={name}
-        onChange={myOnInput}/>
+            type={type}
+            name={name}
+            class=" opacity-0 absolute z-[-1]"
+            onChange={myOnInput}
+            id="file-input"/>
+        </>
+        :
+        (big?
+            <textarea
+            placeholder={placeholder}
+            class={textAreaClasses}
+            name={name}
+            onInput={(e)=>specialOnInput(e)}
+            rows={rows}
+            cols={cols}
+            ></textarea>
+            :
+            <input 
+            type={type?type:"text"}  
+            placeholder={placeholder}  
+            class={classes}
+            name={name}
+            onChange={myOnInput}/>)
+        )
+        
     )
 }

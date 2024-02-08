@@ -13,29 +13,32 @@ const {icon} = Astro.props;
 // TODO: change the links depending of the type of user
 ---
 
-<header class="max-w-screen-xl mx-auto px-8 pt-4">
-    {
-        accessToken && refreshToken ? 
-        <div class="flex justify-between items-center relative z-50">
-            
-            <a href="/">
-                <img src={"/"+icon} class
-                ="h-12 w-12" alt="Logo" />
-            </a>
-            <img src="/nav.svg" class="h-6 w-6 cursor-pointer" alt="Menu" id="toggler" />
-            
-        </div>
-        <nav class="flex flex-col items-end bg-slate-400 absolute right-0 top-12 w-dvw py-4 px-4 transition-all z-0 opacity-0 ">
-                <a href="/dashboard" class="text-gray-700 hover:text-yellow-50 transition-colors border-b-2">Dashboard</a>
-                <a href="/api/auth/signout" class="ml-4 text-gray-700 hover:text-yellow-50 transition-colors border-b-2">Logout</a>
+<header class="w-full  mx-auto px-8 pt-4 sticky flex justify-center z-50">
+    <div class="w-full max-w-screen-xl relative">
+        {
+            accessToken && refreshToken ? 
+            <div class="flex justify-between items-center relative z-40">
+                
+                <a href="/">
+                    <img src={"/"+icon} class
+                    ="h-14 w-14" alt="Logo" />
+                </a>
+                <img src="/nav.svg" class="h-9 w-9 cursor-pointer" alt="Menu" id="toggler" />
+                
+            </div>
+            <nav class="flex flex-col items-end absolute right-0 top-14 w-full max-w-screen-xl m-auto py-4 px-4 transition-all opacity-0 bg-white-smoke border-b-2 border-black after:z-30 after:absolute">
+                    <a href="/dashboard" class="text-gray-700 hover:border-black transition-colors border-b-2 ">Dashboard</a>
+                    <a href="/api/auth/signout" class="ml-4 text-gray-700 hover:border-black transition-colors border-b-2">Logout</a>
             </nav>
-        :
-        <div class="flex justify-center items-center">
-            <a href="/">
-                <img src={"/"+icon} class="h-12 w-12" alt="Logo" />
-            </a>
-        </div>
-    }
+            :
+            <div class="pt-20 flex justify-center items-center z-50">
+                <a href="/">
+                    <img src={"/"+icon} class="h-24 w-24" alt="Logo" />
+                </a>
+            </div>
+        }
+    </div>
+    
     
 </header>
 
@@ -51,6 +54,14 @@ const {icon} = Astro.props;
         const nav = document.querySelector("nav");
         nav?.classList.toggle("opacity-100");
         nav?.classList.toggle("translate-y-4");
-        nav?.classList.toggle("z-50");
+        nav?.classList.toggle("z-30");
+
     }
 </script>
+
+<style>
+    a{
+        font-size: 1.25rem/* 20px */;
+        line-height: 1.75rem/* 28px */;
+    }
+</style>

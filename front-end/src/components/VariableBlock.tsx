@@ -39,7 +39,6 @@ export default function VaribleBlock({children,manager}:Props){
     }
     return (
         <>
-            N = {n.value}
             <div class="flex flex-col gap-2" id="blocksContainer">
             {childrens.map((el,i) => el)}
             </div>
