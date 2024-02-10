@@ -1,6 +1,7 @@
 ---
 
 import Layout from "../layouts/Layout.astro";
+import Image from "../components/Image";
 import { supabase } from "../lib/supabase";
 
 const { cookies, redirect } = Astro;
@@ -12,8 +13,9 @@ interface Rifa {
     foto: string;
     nombre: string;
     reglamento: string;
+    id: number;
 }
-
+/*
 if (!accessToken || !refreshToken) {
   return redirect("/login");
 }
@@ -33,6 +35,7 @@ if (error) {
 
   return redirect("/signin");
 }
+*/
 // TODO FETCH ON USER 
 const rifas = await fetch("http://localhost:4321/api/rifa/dashboard");
 // Intentar obtener campañas, si no tienes eres nuevo
@@ -47,15 +50,36 @@ function nameToPageName(name: string){
 }
 ---
 <Layout title="dashboard">
-  <h2>Tus rifas</h2>
-  <ul>
-    {rifasData.map((rifa) => (
-      <li>
-        <a href={`/rifa/${nameToPageName(rifa.nombre)}`}>{rifa.nombre}</a>
-        <img src={rifa.foto} alt={`Foto de la campaña ${rifa.nombre}`}>
-        <p>{rifa.reglamento}</p>
-      </li>
-    ))}
-  </ul>
-  <a href="/rifa/crear">Crear una rifa</a>
+  <div>
+    
+    <div class="flex justify-center items-center px-8">
+      <div class="h-full w-full flex flex-col justify-center items-center">
+          <h2>Tus rifas</h2>
+          <ul class="flex flex-col  max-w-screen-lg gap-12 items-center pt-6">
+            {rifasData.map((rifa) => (
+              <li class="hover:shadow-md hover:-translate-y-6 transition-all">
+                <a href={`/rifa/${rifa.id.toString()}`}>
+                <article class="flex flex-col items-center md:items-stretch md:flex-row gap-8">
+                  <Image classList="shrink-0" src={rifa.foto} alt={`Foto de la campaña ${rifa.nombre}`}/>
+                  
+                  <div>
+                    <h3 class=" text-3xl">{rifa.nombre}</h3>
+                    <p class=" max-h-36 overflow-y-hidden text-ellipsis test">{rifa.reglamento}</p>
+                  </div>
+                  
+                </article>
+                </a>
+              </li>
+            ))}
+          </ul>
+          <a href="/rifa/crear" class="absolute bottom-10 right-10">
+            
+            Crear una rifa
+          </a>
+        </div>
+      </div>
+    </div>
+    
+  
+  
 </Layout>

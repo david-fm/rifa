@@ -35,7 +35,11 @@ const { title } = Astro.props;
 		font-family: system-ui, sans-serif;
 		background-color: whitesmoke;
 	}
-  p, label,button{
+  small{
+    font-size: 0.9375rem/* 14px */;
+    line-height: 1.3125rem/* 20px */;
+  }
+  p, b, label,button{
     font-size: 1.25rem/* 20px */;
     line-height: 1.75rem/* 28px */;
   }
@@ -173,9 +177,6 @@ const { title } = Astro.props;
    * Add the correct font size in all browsers.
    */
   
-  small {
-    font-size: 80%;
-  }
   
   /**
    * Prevent `sub` and `sup` elements from affecting the line height in

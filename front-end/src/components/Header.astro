@@ -13,7 +13,7 @@ const {icon} = Astro.props;
 // TODO: change the links depending of the type of user
 ---
 
-<header class="w-full  mx-auto px-8 pt-4 sticky flex justify-center z-50">
+<header class="w-full  mx-auto px-8 pt-4 sticky flex justify-center ">
     <div class="w-full max-w-screen-xl relative">
         {
             accessToken && refreshToken ? 
@@ -26,7 +26,7 @@ const {icon} = Astro.props;
                 <img src="/nav.svg" class="h-9 w-9 cursor-pointer" alt="Menu" id="toggler" />
                 
             </div>
-            <nav class="flex flex-col items-end absolute right-0 top-14 w-full max-w-screen-xl m-auto py-4 px-4 transition-all opacity-0 bg-white-smoke border-b-2 border-black after:z-30 after:absolute">
+            <nav class="flex flex-col items-end absolute right-0 top-14 w-full max-w-screen-xl m-auto py-4 px-4 transition-all opacity-0 bg-white-smoke border-b-2 border-black after:absolute -translate-y-4">
                     <a href="/dashboard" class="text-gray-700 hover:border-black transition-colors border-b-2 ">Dashboard</a>
                     <a href="/api/auth/signout" class="ml-4 text-gray-700 hover:border-black transition-colors border-b-2">Logout</a>
             </nav>
@@ -44,6 +44,7 @@ const {icon} = Astro.props;
 
 <script>
     const toggler = document.getElementById("toggler");
+    const header = document.querySelector("header");
     toggler?.addEventListener("click", onToggleMenu);
 
     function onToggleMenu() {
@@ -53,8 +54,10 @@ const {icon} = Astro.props;
             toggler?.setAttribute("src","/nav.svg");
         const nav = document.querySelector("nav");
         nav?.classList.toggle("opacity-100");
-        nav?.classList.toggle("translate-y-4");
+        nav?.classList.toggle("-translate-y-4");
         nav?.classList.toggle("z-30");
+        nav?.classList.toggle("after:z-30");
+        header?.classList.toggle("z-50");
 
     }
 </script>

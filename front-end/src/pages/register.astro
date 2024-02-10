@@ -39,7 +39,6 @@ if (accessToken && refreshToken) {
 <script>
 const handleError = async (err: any) => {
     const error = document.getElementById('error');
-    console.log(error);
     // if error 500
     if (err.status === 500) {
         if(error)
@@ -59,7 +58,6 @@ const handleError = async (err: any) => {
 }
 
 const handleResponse = (res: any) => {
-    console.log(res);
     if (res.status === 200) {
         window.location.href = '/login';
     }
@@ -67,7 +65,6 @@ const handleResponse = (res: any) => {
 const form = document.querySelector('form');
 form?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    console.log('submit');
     const formData = new FormData(form);
     // send form data
     const res = await fetch('/api/auth/register', {

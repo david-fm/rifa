@@ -42,7 +42,7 @@ export default function CreateForm({}: Props) {
         form.current?.submit();
     }
     return (
-        <div class=" top-0 h-full w-full flex justify-center items-center">
+        <div class="h-full w-full flex justify-center items-center">
             <div class="flex flex-col lg:flex-row-reverse max-w-screen-lg gap-10 lg:gap-32 items-center">
             {info[signal.value]}
                 
