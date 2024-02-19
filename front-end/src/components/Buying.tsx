@@ -1,3 +1,4 @@
+import type { ValidRedirectStatus } from "astro";
 import Block from "./Block";
 import Button from "./Button";
 import { effect, signal } from "@preact/signals";
@@ -5,16 +6,43 @@ interface Props{
     precio_ticket: number;
     cantidad_tickets:number;
     max_reservas: number;
+    num_visibles: boolean;
+    loggedIn: boolean;
 }
 
 const comprados = signal(0);
+const pagando = signal(false);
 
-export default function Buying({precio_ticket, cantidad_tickets, max_reservas}:Props){
+export default function Buying({precio_ticket, cantidad_tickets, max_reservas, num_visibles, loggedIn}:Props){
 
     effect(()=>{comprados.value>max_reservas?comprados.value=max_reservas:null})
+    effect(()=>{comprados.value<0?comprados.value=0:null})
+
+    function handlePagar(){
+
+        if(comprados.value>0)
+        {
+            if(loggedIn)
+            {
+                if(num_visibles)
+                    pagando.value=true;
+                else
+                {
+                    alert("Redirigiendo a la pasarela de pago...");
+                }
+                
+            }
+            else
+                window.location.replace("/login");
+            
+                
+        }
+            
+    }
 
     return(
         <>
+        <div class="w-full">
         <section class="py-8 flex flex-col gap-3 border-slate-300 border-b-2 w-full">
             <h2 class="text-center">Cantidad de Tickets</h2>
             <div class="grid grid-cols-2 grid-rows-2 gap-y-8 gap-x-12">
@@ -24,9 +52,9 @@ export default function Buying({precio_ticket, cantidad_tickets, max_reservas}:P
                 <Block onClick={()=>{comprados.value+=20}} text="+ 20" textButton="Añadir"/>
             </div>
             <div class="flex justify-evenly items-center">
-                <Button onClick={()=>{comprados.value-=1}} type="button" text="-" extraClass="w-auto"/>
+                <Button onClick={()=>{comprados.value-=1}} type="button" text="-" extraClass="!w-auto"/>
                 <p>{comprados.toString()}</p>
-                <Button onClick={()=>{comprados.value+=1}} type="button" text="+" extraClass="w-auto"/>
+                <Button onClick={()=>{comprados.value+=1}} type="button" text="+" extraClass="!w-auto"/>
             </div>
         </section>
         <section class="py-8 px-12 flex flex-col gap-3 w-full">
@@ -36,8 +64,19 @@ export default function Buying({precio_ticket, cantidad_tickets, max_reservas}:P
             <div class="flex justify-between">
             <p>Precio x Numero</p><p>{precio_ticket*comprados.value}€</p>
             </div>
-            <Button text="PAGAR" type="button" extraClass="justify-center mt-5 hover:-translate-y-3 hover:shadow-lg transition-all"/>
+            <Button text="PAGAR" type="button" extraClass="justify-center w-auto mt-5 mx-auto hover:-translate-y-3 hover:shadow-lg transition-all" onClick={handlePagar}/>
         </section>
+        </div>
+        {pagando.value?
+        <div class="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
+            <div class="bg-white p-8 rounded-lg">
+                <h2 class="text-center">PAGANDO</h2>
+                <p class="text-center">Espere un momento</p>
+                <Button text="Cancelar" type="button" extraClass="justify-center w-auto mt-5 hover:-translate-y-3 hover:shadow-lg transition-all" onClick={()=>{pagando.value=false}}/>
+            </div>
+        </div>
+        :null
+        }
         </>
     )
 }

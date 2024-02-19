@@ -11,7 +11,7 @@ interface Props{
 }
 
 export default function Input({placeholder, extraClass, type, name, myOnInput, big, rows, cols}: Props) {
-    const classes = ` w-80  py-5 bg-silver max-w-sm px-5 drop-shadow-sm transition-all ${extraClass}`
+    const classes = ` w-64 lg:w-80 py-4 lg:py-5 bg-silver max-w-sm px-5 drop-shadow-sm transition-all ${extraClass}`
     const textAreaClasses =` w-80 bg-silver max-w-sm px-5 py-3 drop-shadow-sm transition-all resize-none ${extraClass}`
     function specialOnInput(e: Event) {
         resizeTextarea(e);
@@ -26,7 +26,7 @@ export default function Input({placeholder, extraClass, type, name, myOnInput, b
     return (
         (type==="file"?
         <>
-        <label for="file-input" class={classes}>{placeholder}</label>
+        <label for="file-input" class={classes + " cursor-pointer"}>{placeholder}</label>
         <input 
             type={type}
             name={name}

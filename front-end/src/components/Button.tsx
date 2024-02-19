@@ -13,7 +13,7 @@ export default function Button({type, text, id, extraClass, onClick}: Props) {
 
     <button 
     type={type}
-    class={" w-80 py-5 bg-carulean-blue text-white text-center flex items-center px-5 "+extraClass}
+    class={" w-64 lg:w-80 py-4 lg:py-5 bg-carulean-blue text-white text-center flex items-center px-5 "+extraClass}
     id={id?"":id}
     onClick={onClick}>
         {text}

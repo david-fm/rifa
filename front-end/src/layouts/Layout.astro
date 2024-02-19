@@ -18,7 +18,7 @@ const { title } = Astro.props;
 	</head>
 	<body class=" h-screen flex flex-col ">
 		<Header icon='icon.jpg'/>
-    <div class="general-container w-screen relative">
+    <div class="general-container w-screen relative z-10">
       <slot />
     </div>
 		
@@ -28,6 +28,7 @@ const { title } = Astro.props;
   .general-container{
     height: calc(100vh - 3.5rem);
   }
+  
 </style>
 <style is:global>
   

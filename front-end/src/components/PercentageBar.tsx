@@ -3,10 +3,14 @@ interface Props{
 }
 
 export default function PercentageBar({percentage}:Props){
+    const width = `${percentage}%`
     return(
         
         <div class="w-full h-5 border-2">
-            <div class={`w-[${percentage}%] h-full bg-slate-400`}></div>
+            <div class={" h-full bg-slate-400"} 
+            style={{
+                width: width
+            }}></div>
         </div>
     )
 }

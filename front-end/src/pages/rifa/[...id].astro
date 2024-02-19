@@ -26,15 +26,24 @@ const {id} = Astro.params;
 const rifa = await fetch(`http://localhost:4321/api/rifa/${id}`)
 const data: Rifa = await rifa.json()
 
+const { cookies, redirect } = Astro;
+
+const accessToken = cookies.get("sb-access-token");
+const refreshToken = cookies.get("sb-refresh-token");
+
+var loggedIn = false;
+if (accessToken && refreshToken) {
+    loggedIn = true;
+}
 
 ---
 
 <Layout title="dashboard">
     <div class="h-full">
       
-        <div class="flex justify-center items-center h-full px-8">
-            <div class="flex flex-col w-full max-w-screen-lg items-start h-full ">
-                <section class="pb-8 flex flex-col gap-8 border-slate-300 border-b-2 w-full">
+        <div class="flex justify-center items-center h-full px-8 lg:h-auto lg:pb-20">
+            <div class="flex flex-col w-full max-w-screen-lg items-start h-full lg:flex-row lg:items-center lg:gap-8 xl:gap-20 xl:max-w-screen-xl lg:h-auto">
+                <section class="pb-8 flex flex-col gap-8 border-slate-300 border-b-2 w-full lg:border-none">
                     <div>
                         <h1 class=" self-start">{data.nombre}</h1>
                         <Image src={"/"+data.foto} alt="{data.nombre}" w="w-full" />
@@ -65,7 +74,10 @@ const data: Rifa = await rifa.json()
                 <Buying 
                     precio_ticket={data.precio_ticket} 
                     cantidad_tickets={data.cantidad_tickets}
-                    max_reservas={data.max_reservas} client:idle/>
+                    max_reservas={data.max_reservas}
+                    num_visibles={data.num_visibles}
+                    loggedIn={loggedIn}
+                    client:idle/>
             </div>
         </div>
     </div>
