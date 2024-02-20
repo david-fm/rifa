@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import CreateForm from '../../components/CreateForm';
+import { supabase } from "../../lib/supabase";
 
 const { cookies, redirect } = Astro;
 
@@ -10,8 +11,17 @@ const refreshToken = cookies.get("sb-refresh-token");
 if (!accessToken || !refreshToken) {
   return redirect("/login");
 }
-console.log(accessToken, refreshToken);
-//console.log(accessToken, refreshToken);
+
+const username = await supabase.from('base_user').select(
+    'username'
+)
+cookies.set('username', username.data[0].username, {
+    maxAge: 60 * 60 * 24 * 7,
+    path: '/',
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+})
+console.log(cookies.get('username'))
 ---
 <Layout title='KingRifa'>
     <CreateForm client:load/>
