@@ -1,6 +1,6 @@
 import Button from "./Button";
 interface Props{
-    onClick: ()=>any;
+    onClick: ()=>unknown;
     text: string;
     textButton: string;
 }

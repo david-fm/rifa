@@ -1,15 +1,15 @@
-import {Signal, useSignal,effect} from "@preact/signals"
+import { useSignal} from "@preact/signals"
 import type { ComponentChildren } from "preact"
 import { useRef, type MutableRef } from "preact/hooks";
 interface Props{
     children: ComponentChildren;
-    manager?: (references:MutableRef<ComponentChildren>[])=>void;
+    manager?: ((references: MutableRef<HTMLElement>[]) => void) | ((references: MutableRef<ComponentChildren>[]) => void);
 }
 
 export default function VaribleBlock({children,manager}:Props){
     // repeat the children n times
     const n = useSignal(1)
-    const childrens = Array(n.value).fill(1).map((el,i) => children)
+    const childrens = Array(n.value).fill(1).map(() => children)
     const references = childrens.map((c) => useRef(c))
 
     const handleOnPlus = () => {
@@ -35,12 +35,13 @@ export default function VaribleBlock({children,manager}:Props){
     
     //setNameChildren(children,0)
     if(manager){
-        manager(references)
+        const referencesHTML = references as MutableRef<HTMLElement>[]
+        manager(referencesHTML)
     }
     return (
         <>
             <div class="flex flex-col gap-2" id="blocksContainer">
-            {childrens.map((el,i) => el)}
+            {childrens.map((el) => el)}
             </div>
             <div class="flex gap-1">
                 <button type="button" class=" text-4xl" onClick={handleOnPlus}>+</button>

@@ -3,17 +3,15 @@ import VaribleBlock from "./VariableBlock";
 import type { ComponentChildren } from "preact"
 import type {  MutableRef } from "preact/hooks";
 
-interface Props{
-    name?: string;
-}
 
-export default function Prize({name}:Props) {
+export default function Prize() {
 
     function setNameChild(references:MutableRef<ComponentChildren>[]){
         //console.log(references)
         for (let i = 0; i < references.length; i++) {
-            if(references[i].current.props?.name){
-                references[i].current.props.name = i + "-" + "premio"
+            const inputElment: HTMLInputElement = references[i].current as HTMLInputElement
+            if(inputElment.name){
+                inputElment.name = i + "-" + "premio"
             }
         }
     }

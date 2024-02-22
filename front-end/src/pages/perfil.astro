@@ -39,7 +39,7 @@ if (!(accessToken && refreshToken)) {
 
 // TODO: comprobar tipo de usuario, si es creador o no
 
-const iscreador = true;
+const iscreador = cookies.get("iscreador") !== undefined ? true : false;
 ---
 
 <Layout title="KingRifa">
@@ -62,22 +62,24 @@ const iscreador = true;
                 )
             }
             
-            <form class="pt-4 flex flex-col items-center">
+            <form class="pt-4 flex flex-col items-center" action="/api/auth/edit">
                 {
                     iscreador && (
                         <Input type="file" placeholder="Logo" extraClass="hidden" />
                     )
                 }
                 
-                <Input type="text" placeholder="Nombre de usuario" />
-                <Input type="text" placeholder="Correo electrónico" />
+                <Input name="username" type="text" placeholder="Nombre de usuario" />
                 {
                     iscreador && (
-                        <Input type="text" placeholder="Link soporte" />
+                        <Input name="support_link" type="text" placeholder="Link soporte" />
                     )
                 }
+                {/* 
+                <Input type="text" placeholder="Correo electrónico" />
+                
                 <Input type="password" placeholder="Contraseña" />
-                <Input type="password" placeholder="Contraseña actual" />
+                <Input type="password" placeholder="Contraseña actual" />*/}
                 <Button type="button" text="Actualizar"/>
             </form>
         </div>

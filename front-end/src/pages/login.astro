@@ -12,6 +12,7 @@ const refreshToken = cookies.get("sb-refresh-token");
 if (accessToken && refreshToken) {
   return redirect("/dashboard");
 }
+
 ---
 
 <Layout title="KingRifa">
@@ -37,6 +38,17 @@ if (accessToken && refreshToken) {
 </Layout>
 
 <script>
+function isLocalStorageAvailable() {
+    try {
+      // Local storage is available if the property exists
+      return typeof window.localStorage !== 'undefined';
+    } catch (error) {
+      // If window.localStorage exists but the user is blocking local
+      // storage, the attempting to read the property throws an exception.
+      // If this happens, consider local storage not available.
+      return false;
+    }
+  }
 const form = document.querySelector('form');
 const handleError = (err: any) => {
     const error = document.getElementById('error');
@@ -61,6 +73,11 @@ form?.addEventListener('submit', async (e) => {
         return;
     }
     else{
+        res.json().then(data => {
+            if(isLocalStorageAvailable()){
+                localStorage.setItem('userDetails', JSON.stringify(data));
+            }
+        })
         window.location.href = '/dashboard';
     }
 });
