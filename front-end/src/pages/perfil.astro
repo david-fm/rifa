@@ -65,14 +65,14 @@ const iscreador = cookies.get("iscreador") !== undefined ? true : false;
             <form class="pt-4 flex flex-col items-center" action="/api/auth/edit">
                 {
                     iscreador && (
-                        <Input type="file" placeholder="Logo" extraClass="hidden" />
+                        <Input type="file" placeholder="Logo" extraClass="hidden" id="logoInput"/>
                     )
                 }
                 
-                <Input name="username" type="text" placeholder="Nombre de usuario" />
+                <Input name="username" type="text" placeholder="Nombre de usuario" id="usernameInput" />
                 {
                     iscreador && (
-                        <Input name="support_link" type="text" placeholder="Link soporte" />
+                        <Input name="support_link" type="text" placeholder="Link soporte" id="supportLinkInput" />
                     )
                 }
                 {/* 
@@ -80,7 +80,7 @@ const iscreador = cookies.get("iscreador") !== undefined ? true : false;
                 
                 <Input type="password" placeholder="Contraseña" />
                 <Input type="password" placeholder="Contraseña actual" />*/}
-                <Button type="button" text="Actualizar"/>
+                <Button type="submit" text="Actualizar"/>
             </form>
         </div>
     </div>
@@ -92,21 +92,31 @@ const iscreador = cookies.get("iscreador") !== undefined ? true : false;
     
     const creador = document.getElementById("creador");
     const baseUser = document.getElementById("baseUser");
+    const form = document.querySelector("form");
+
+    const username =  document.getElementById("username");
+    const gmail = document.getElementById("gmail");
+    const supportLink = document.getElementById("supportLink");
+    const img = document.getElementById("img");
+
+    const logoInput = document.getElementById("logoInput") as HTMLInputElement;
+    const usernameInput = document.getElementById("usernameInput") as HTMLInputElement;
+    const supportLinkInput = document.getElementById("supportLinkInput") as HTMLInputElement;
     
     const isCreador = creador !== null;
     
     function updateContent(user: userDetails){
         if (isCreador){
-            const username =  creador?.querySelector("#username");
-            const gmail = creador?.querySelector("#gmail");
-            const supportLink = creador?.querySelector("#supportLink") as HTMLInputElement;
-            const img = creador?.querySelector("#img");
+            
 
-            if(username && gmail && supportLink && img){
+            if(username && gmail && supportLink && img && logoInput && usernameInput && supportLinkInput){
                 username.textContent = user.username?user.username:"My username";
-                console.log(user);
                 gmail.textContent = user.email;
-                supportLink.value = user.creadorInfo?.support_link?user.creadorInfo?.support_link:"";
+                supportLink.textContent = user.creadorInfo?.support_link?user.creadorInfo?.support_link:"";
+
+                usernameInput.value = user.username?user.username:"";
+                supportLinkInput.value = user.creadorInfo?.support_link?user.creadorInfo?.support_link:"";
+                //logoInput.src = user.creadorInfo?.logo?user.creadorInfo?.logo:"";
                 //img.src = user.logo;
             }
             else{
@@ -114,12 +124,12 @@ const iscreador = cookies.get("iscreador") !== undefined ? true : false;
             }
         }
         else{
-            const username =  baseUser?.querySelector("#username");
-            const gmail = baseUser?.querySelector("#gmail");
 
-            if(username && gmail){
+            if(username && gmail && usernameInput){
                 username.textContent = user.username?user.username:"My username";
                 gmail.textContent = user.email;
+
+                usernameInput.value = user.username?user.username:"";
             }
             else{
                 console.error("No se ha podido encontrar alguno de los elementos");
@@ -142,14 +152,64 @@ const iscreador = cookies.get("iscreador") !== undefined ? true : false;
 
         return user;
     }
-    getUserData().then((user) => {
+    function updateUser(data:any, actualUser: userDetails){
+        if (isCreador){
 
+            if(username && supportLink && img && logoInput && usernameInput && supportLinkInput){
+                username.textContent = data.username;
+                supportLink.textContent = data.support_link;
+                //img.src = data.logo;
+
+                usernameInput.value = data.username;
+                supportLinkInput.value = data.support_link;
+                //logoInput.src = data.logo;
+            }
+        }
+        else{
+            if(username && usernameInput){
+                username.textContent = data.username;
+                usernameInput.value = data.username;
+            }
+        }
+        if (isLocalStorageAvailable()) {
+            actualUser.username = data.username;
+            if (isCreador){
+                if(!actualUser.creadorInfo) 
+                    actualUser.creadorInfo = {
+                        logo: "",
+                        support_link: data.support_link,
+                        support_type: 0
+                    };
+                else
+                    actualUser.creadorInfo.support_link = data.support_link;
+                //actualUser.logo = data.logo;
+            }
+
+            localStorage.setItem("userDetails", JSON.stringify(actualUser));
+        }
+    }
+    let actualUser: userDetails;
+    getUserData().then((user) => {
+        actualUser = user;
         updateContent(user);
     });
 
-    const img = document.getElementById("img");
     img?.addEventListener("click", () => {
         const input = document.querySelector("input[type='file']") as HTMLInputElement;
         input?.click();
+    });
+    form?.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const formData = new FormData(form as HTMLFormElement);
+        fetch("/api/auth/edit", {
+            method: "POST",
+            body: formData,
+        }).then((res) => {
+            if (res.ok) {
+                res.json().then((data) => {
+                    updateUser(data, actualUser);
+                });
+            }
+        })
     });
 </script>
