@@ -1,18 +1,26 @@
 import type { APIRoute } from "astro";
 import { supabase } from "../../../lib/supabase";
+import type { userDetails } from "../../../types/localStorage";
+import { JSDOM } from 'jsdom';
+import DOMPurify from 'dompurify';
 
 
 
 export const POST: APIRoute = async ({ request, cookies }) => {
+  
+  const purify = DOMPurify(new JSDOM().window);
+
 
   const formData = await request.formData();
-  const email = formData.get("email")?.toString();
-  const password = formData.get("password")?.toString();
-  // First, check if the email and password are provided
-
-  if (!email || !password) {
+  const testEmail = formData.get("email");
+  const testPassword = formData.get("password");
+  if(testEmail === null || testPassword === null){
     return new Response("Email and password are required", { status: 400 });
   }
+
+  const email = purify.sanitize(testEmail.toString());
+  const password = purify.sanitize(testPassword.toString());
+
   // Then, sign in the user with the provided email and password
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
@@ -39,20 +47,28 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   support_type`)
   .eq("id", data?.user?.id).single();
   
+  if(baseInfo.data?.username !== undefined && data?.user.email !== undefined){
 
-  const iscreador = creadorInfo.data !== null;
-  if (iscreador) {
-    cookies.set("iscreador", "true", {
-      path: "/",
-    });
+    if(creadorInfo.data !== null){
+      cookies.set("iscreador", "", {
+        path: "/",
+      });
+    }
+
+    const toSend: userDetails = {
+      username: baseInfo.data?.username,
+      email: data?.user?.email,
+      creadorInfo: creadorInfo.data
+    }
+
+    return new Response(
+      JSON.stringify(toSend), 
+        {
+          status: 200,
+          headers: {
+            "content-type": "application/json",
+          },
+        });
   }
-
-  
-
-  return new Response(JSON.stringify({ username: baseInfo.data?.username, iscreador, creadorInfo: creadorInfo.data }), {
-    status: 200,
-    headers: {
-      "content-type": "application/json",
-    },
-  });
+  return new Response("Error while login", { status: 500 });
 };

@@ -1,17 +1,25 @@
 export const prerender = false
 import type { APIRoute } from "astro";
 import { supabase } from "../../../lib/supabase";
+import { JSDOM } from 'jsdom';
+import DOMPurify from 'dompurify';
 
-export const POST: APIRoute = async ({ request, redirect }) => {
+export const POST: APIRoute = async ({ request }) => {
+  const purify = DOMPurify(new JSDOM().window);
+
   const formData = await request.formData();
-  const email = formData.get("email")?.toString();
-  const password = formData.get("password")?.toString();
-  const passwordConfirmation = formData.get("passwordConfirmation")?.toString();
+  const testEmail = formData.get("email");
+  const testPassword = formData.get("password");
+  const testPasswordConfirmation = formData.get("passwordConfirmation");
 
-
-  if (!email || !password) {
-    return new Response("Email and password are required", { status: 400 });
+  if(testEmail === null || testPassword === null || testPasswordConfirmation === null){
+    return new Response("Email, password and password confirmation are required", { status: 400 });
   }
+  
+
+  const email = purify.sanitize(testEmail.toString());
+  const password = purify.sanitize(testPassword.toString());
+  const passwordConfirmation = purify.sanitize(testPasswordConfirmation.toString());
 
   if (password !== passwordConfirmation) {
       return new Response("Passwords do not match", { status: 400 });

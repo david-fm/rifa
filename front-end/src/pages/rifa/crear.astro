@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import CreateForm from '../../components/CreateForm';
 import { supabase } from "../../lib/supabase";
+import { jwtDecode } from "jwt-decode";
 
 const { cookies, redirect } = Astro;
 
@@ -11,17 +12,31 @@ const refreshToken = cookies.get("sb-refresh-token");
 if (!accessToken || !refreshToken) {
   return redirect("/login");
 }
+const token:string | undefined= cookies.get("sb-access-token")?.value;
+if (!token) {
+    return redirect("/login");
+}
 
-const username = await supabase.from('base_user').select(
+const decoded = jwtDecode(token);
+const id = decoded.sub;
+const {data, error} = await supabase.from('base_user')
+.select(
     'username'
 )
-cookies.set('username', username.data[0].username, {
-    maxAge: 60 * 60 * 24 * 7,
-    path: '/',
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
-})
-console.log(cookies.get('username'))
+.match({ id: id })
+.single()
+
+if(data?.username){
+    const username = data.username;
+
+    cookies.set('username', username, {
+        maxAge: 60 * 60 * 24 * 7,
+        path: '/',
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+    })
+    console.log(cookies.get('username'))
+}
 ---
 <Layout title='KingRifa'>
     <CreateForm client:load/>

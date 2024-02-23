@@ -38,6 +38,7 @@ if (accessToken && refreshToken) {
 </Layout>
 
 <script>
+
 function isLocalStorageAvailable() {
     try {
       // Local storage is available if the property exists
@@ -77,8 +78,9 @@ form?.addEventListener('submit', async (e) => {
             if(isLocalStorageAvailable()){
                 localStorage.setItem('userDetails', JSON.stringify(data));
             }
+            window.location.href = '/dashboard';
         })
-        window.location.href = '/dashboard';
+        
     }
 });
 </script>

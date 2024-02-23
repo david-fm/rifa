@@ -26,7 +26,7 @@ const {icon} = Astro.props;
                 <img src="/nav.svg" class="h-9 w-9 cursor-pointer lg:hidden" alt="Menu" id="toggler" />
                 <nav class="hidden lg:flex lg:justify-evenly">
                     <a href="/dashboard" class="text-gray-700 transition-colors  ">Dashboard</a>
-                    <a href="/api/auth/signout" class="ml-4 text-gray-700 transition-colors">Logout</a>
+                    <p  class="ml-4 text-gray-700 transition-colors cursor-pointer" id="signout">Logout</p>
                     <a href="/perfil" class="ml-4 text-gray-700 transition-colors">Perfil</a>
                 </nav>
                 
@@ -49,6 +49,8 @@ const {icon} = Astro.props;
 </header>
 
 <script>
+    import { isLocalStorageAvailable } from "../lib/functions";
+
     const toggler = document.getElementById("toggler");
     const header = document.querySelector("header");
     toggler?.addEventListener("click", onToggleMenu);
@@ -66,6 +68,16 @@ const {icon} = Astro.props;
         header?.classList.toggle("z-50");
 
     }
+
+    const signout = document.getElementById("signout");
+    const logOut = () => {
+        if(isLocalStorageAvailable()){
+            localStorage.removeItem("userDetails");
+        }
+
+        window.location.href = "/api/auth/signout";
+    }
+    signout?.addEventListener("click", logOut);
 </script>
 
 <style>

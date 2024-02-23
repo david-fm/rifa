@@ -12,6 +12,7 @@ interface Creador {
     basic : User;
     logo: string;
     support_link: string;
+    support_type: number;
 }
 
 const { cookies, redirect } = Astro;
@@ -22,20 +23,22 @@ const refreshToken = cookies.get("sb-refresh-token");
 const creador: Creador = {
     basic: {
         username: "Creador",
-        gmail: "hola@gmail.com",
+        gmail: "mi@gmail.com",
     },
     logo: "https://avatars.githubusercontent.com/u/472319",
     support_link: "https://www.google.com",
+    support_type: 0,
 };
 
 const user: User = {
     username: "Creador",
-    gmail: "adios@gmail.com",
+    gmail: "mi@gmail.com",
 };
 
 if (!(accessToken && refreshToken)) {
     redirect("/login");
-};
+}
+
 
 // TODO: comprobar tipo de usuario, si es creador o no
 
@@ -44,21 +47,18 @@ const iscreador = cookies.get("iscreador") !== undefined ? true : false;
 
 <Layout title="KingRifa">
     <div class="flex flex-col items-center justify-center h-full">
-        <div class="flex flex-col items-center justify-center w-96">
+        <div class="flex flex-col items-center justify-center w-96" id={iscreador?"creador":"baseUser"}>
             {
-                iscreador ? (
+                iscreador && (
                 <img src={creador.logo} class="w-24 h-24 rounded-full cursor-pointer" id="img"/>
-                )
-                :(
-                <img src={creador.logo} class="w-24 h-24 rounded-full"/>
                 )
 
             }
-            <h1 class="text-2xl font-bold mt-4">{creador.basic.username}</h1>
-            <p class="text-sm text-gray-500 mt-1">Gmail: {creador.basic.gmail}</p>
+            <h1 class="text-2xl font-bold mt-4" id="username">{creador.basic.username}</h1>
+            <p class="text-sm text-gray-500 mt-1" id="gmail">Gmail: {creador.basic.gmail}</p>
             {
                 iscreador && (
-                    <p class="text-sm text-gray-500 mt-1">Link soporte: {creador.support_link}</p>
+                    <p class="text-sm text-gray-500 mt-1" id="supportLink">Link soporte: {creador.support_link}</p>
                 )
             }
             
@@ -87,6 +87,66 @@ const iscreador = cookies.get("iscreador") !== undefined ? true : false;
 </Layout>
 
 <script>
+    import { isLocalStorageAvailable } from "../lib/functions";
+    import type { userDetails } from "../types/localStorage";
+    
+    const creador = document.getElementById("creador");
+    const baseUser = document.getElementById("baseUser");
+    
+    const isCreador = creador !== null;
+    
+    function updateContent(user: userDetails){
+        if (isCreador){
+            const username =  creador?.querySelector("#username");
+            const gmail = creador?.querySelector("#gmail");
+            const supportLink = creador?.querySelector("#supportLink") as HTMLInputElement;
+            const img = creador?.querySelector("#img");
+
+            if(username && gmail && supportLink && img){
+                username.textContent = user.username?user.username:"My username";
+                console.log(user);
+                gmail.textContent = user.email;
+                supportLink.value = user.creadorInfo?.support_link?user.creadorInfo?.support_link:"";
+                //img.src = user.logo;
+            }
+            else{
+                console.error("No se ha podido encontrar alguno de los elementos");
+            }
+        }
+        else{
+            const username =  baseUser?.querySelector("#username");
+            const gmail = baseUser?.querySelector("#gmail");
+
+            if(username && gmail){
+                username.textContent = user.username?user.username:"My username";
+                gmail.textContent = user.email;
+            }
+            else{
+                console.error("No se ha podido encontrar alguno de los elementos");
+            }
+
+        }
+    }
+
+    async function getUserData(){
+        let user: userDetails;
+        if (isLocalStorageAvailable()) {
+            user = JSON.parse(localStorage.getItem("userDetails") as string);
+        }
+        else{
+            const userData = await fetch("/api/auth/userdata",{
+                method: "POST"
+            });
+            user = await userData.json();
+        }
+
+        return user;
+    }
+    getUserData().then((user) => {
+
+        updateContent(user);
+    });
+
     const img = document.getElementById("img");
     img?.addEventListener("click", () => {
         const input = document.querySelector("input[type='file']") as HTMLInputElement;
