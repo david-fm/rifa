@@ -19,7 +19,7 @@ export default function ButtonInput(props: Props) {
             
             {
                 
-				<Input placeholder='Buscar rifas' extraClass={(showInput?" opacity-100 rounded-b-md":" opacity-0 -translate-y-8")+" relative z-0 "} type="text" name="search"/>
+				<Input placeholder='Buscar rifas' extraClass={(showInput?" opacity-100 rounded-b-md":" opacity-0 -translate-y-8")+" relative z-0 "} type="text" name="search" isRequiered/>
             }
 		</div>
     )

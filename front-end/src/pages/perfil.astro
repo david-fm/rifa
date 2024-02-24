@@ -69,10 +69,10 @@ const iscreador = cookies.get("iscreador") !== undefined ? true : false;
                     )
                 }
                 
-                <Input name="username" type="text" placeholder="Nombre de usuario" id="usernameInput" />
+                <Input name="username" type="text" placeholder="Nombre de usuario" id="usernameInput" isRequiered/>
                 {
                     iscreador && (
-                        <Input name="support_link" type="text" placeholder="Link soporte" id="supportLinkInput" />
+                        <Input name="support_link" type="text" placeholder="Link soporte" id="supportLinkInput" isRequiered/>
                     )
                 }
                 {/* 
