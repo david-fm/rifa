@@ -5,17 +5,19 @@ import Input from '../components/Input';
 
 const { cookies, redirect } = Astro;
 
-const accessToken = cookies.get("sb-access-token");
-const refreshToken = cookies.get("sb-refresh-token");
+const accessToken = cookies.get("access-token");
+//const refreshToken = cookies.get("sb-refresh-token");
 
-if (accessToken && refreshToken) {
+if (accessToken) {
   return redirect("/dashboard");
 }
+
+const serverURL = import.meta.env.API;
 ---
 
 <Layout title="KingRifa">
 	<main class="h-full">
-        <form action="/api/auth/register" id="form" class="h-full">
+        <form action={serverURL+"api-auth/register/"} id="form" class="h-full">
             <div class=" h-full w-full flex  justify-center items-center ">
                 <div class="flex flex-col gap-8 max-w-80">
                     <div class="flex flex-col gap-4 items-center">
@@ -58,7 +60,7 @@ const handleError = async (err: any) => {
 }
 
 const handleResponse = (res: any) => {
-    if (res.status === 200) {
+    if (res.status === 201) {
         window.location.href = '/login';
     }
 }
@@ -67,11 +69,11 @@ form?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const formData = new FormData(form);
     // send form data
-    const res = await fetch('/api/auth/register', {
+    const res = await fetch(form.action, {
         method: 'POST',
         body: formData
     });
-    if (res.status === 200) {
+    if (res.status === 201) {
         handleResponse(res);
     }
     else {

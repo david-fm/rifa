@@ -5,18 +5,17 @@ interface Props{
 
 const {cookies} = Astro;
 
-const accessToken = cookies.get("sb-access-token");
-const refreshToken = cookies.get("sb-refresh-token");
+const accessToken = cookies.get("access-token");
 
 const {icon} = Astro.props;
 
 // TODO: change the links depending of the type of user
 ---
 
-<header class={`w-full  mx-auto px-8 pt-4 flex justify-center z-10 bg-white-smoke sticky ${accessToken && refreshToken ? "top-0": "" }`}>
+<header class={`w-full  mx-auto px-8 pt-4 flex justify-center z-10 bg-white-smoke sticky ${accessToken ? "top-0": "" }`}>
     <div class="w-full max-w-screen-xl relative">
         {
-            accessToken && refreshToken ? 
+            accessToken ? 
             <div class="flex justify-between items-center relative z-40">
                 
                 <a href="/">

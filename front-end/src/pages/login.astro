@@ -4,24 +4,17 @@ import Button from '../components/Button.tsx';
 import Input from '../components/Input';
 
 
-const { cookies, redirect } = Astro;
-
-const accessToken = cookies.get("sb-access-token");
-const refreshToken = cookies.get("sb-refresh-token");
-
-if (accessToken && refreshToken) {
-  return redirect("/dashboard");
-}
+const serverURL = import.meta.env.API;
 
 ---
 
 <Layout title="KingRifa">
 	<main class="h-full">
-        <form action="/api/auth/signin" class="h-full">
+        <form action={serverURL+"api-auth/login/"} class="h-full">
             <div class=" w-full flex justify-center items-center h-full">
                 <div class="w-80 flex flex-col justify-center items-center gap-8">
                     <div class="flex flex-col gap-4">
-                        <Input placeholder='Usuario o correo' type='email' extraClass='rounded-md' name='email' isRequiered/>
+                        <Input placeholder='Correo' type='username' extraClass='rounded-md' name='email' isRequiered/>
                         <Input placeholder='Contraseña' type='password' extraClass='rounded-md' name='password' isRequiered/>
                     </div>
                     <div class="flex flex-col gap-1 items-center">
@@ -38,6 +31,7 @@ if (accessToken && refreshToken) {
 </Layout>
 
 <script>
+
 
 function isLocalStorageAvailable() {
     try {
@@ -64,10 +58,17 @@ form?.addEventListener('submit', async (e) => {
     e.preventDefault();
     //console.log('submit');
     const formData = new FormData(form);
+    const toSend = {
+        username: formData.get('email'),
+        password: formData.get('password')
+    }
     // send form data
-    const res = await fetch('/api/auth/signin', {
+    const res = await fetch(form.action, {
         method: 'POST',
-        body: formData
+        body: JSON.stringify(toSend),
+        headers: {
+            'Content-Type': 'application/json'
+        }
     })
     if(res.status !== 200) {
         handleError(res);
@@ -76,6 +77,8 @@ form?.addEventListener('submit', async (e) => {
     else{
         res.json().then(data => {
             if(isLocalStorageAvailable()){
+                localStorage.setItem('accessToken', data.access);
+                localStorage.setItem('refreshToken', data.refresh);
                 localStorage.setItem('userDetails', JSON.stringify(data));
             }
             window.location.href = '/dashboard';

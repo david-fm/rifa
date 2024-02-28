@@ -3,6 +3,7 @@ interface Props{
     name?: string;          // Name of the input
     extraClass?: string;    // Extra classes to add to the input
     type?: string;          // Decide the type of input
+    accept?: string;        // Accept attribute for file inputs
     big?: boolean;          // Decide whether to use textareas or inputs
     cols?: number;           // Number of columns for the textarea
     rows?: number;           // Number of rows for the textarea
@@ -12,7 +13,7 @@ interface Props{
     // If you want to use onInput you should 
 }
 
-export default function Input({placeholder, extraClass, type, name, myOnInput, big, rows, cols, id, isRequiered}: Props) {
+export default function Input({placeholder, extraClass, type, name, myOnInput, big, rows, cols, id, isRequiered, accept}: Props) {
     const classes = ` w-64 lg:w-80 py-4 lg:py-5 bg-silver max-w-sm px-5 drop-shadow-sm transition-all ${extraClass}`
     const textAreaClasses =` w-80 bg-silver max-w-sm px-5 py-3 drop-shadow-sm transition-all resize-none ${extraClass}`
     function specialOnInput(e: Event) {
@@ -28,7 +29,7 @@ export default function Input({placeholder, extraClass, type, name, myOnInput, b
     return (
         (type==="file"?
             <>
-            <label for="file-input" class={classes + " cursor-pointer"}>{placeholder}</label>
+            <label for="file-input" class={classes + " cursor-pointer"} accept={accept?accept:"image/*"}>{placeholder}</label>
             {isRequiered ?
                 <input 
                 type={type}

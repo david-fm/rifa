@@ -65,7 +65,7 @@ const iscreador = cookies.get("iscreador") !== undefined ? true : false;
             <form class="pt-4 flex flex-col items-center" action="/api/auth/edit">
                 {
                     iscreador && (
-                        <Input type="file" placeholder="Logo" extraClass="hidden" id="logoInput"/>
+                        <Input type="file" placeholder="Logo" extraClass="hidden" id="logoInput" name="image"/>
                     )
                 }
                 
@@ -97,7 +97,7 @@ const iscreador = cookies.get("iscreador") !== undefined ? true : false;
     const username =  document.getElementById("username");
     const gmail = document.getElementById("gmail");
     const supportLink = document.getElementById("supportLink");
-    const img = document.getElementById("img");
+    const img = document.getElementById("img") as HTMLImageElement;
 
     const logoInput = document.getElementById("logoInput") as HTMLInputElement;
     const usernameInput = document.getElementById("usernameInput") as HTMLInputElement;
@@ -113,9 +113,13 @@ const iscreador = cookies.get("iscreador") !== undefined ? true : false;
                 username.textContent = user.username?user.username:"My username";
                 gmail.textContent = user.email;
                 supportLink.textContent = user.creadorInfo?.support_link?user.creadorInfo?.support_link:"";
+                //console.log(supportLink.textContent);
 
                 usernameInput.value = user.username?user.username:"";
-                supportLinkInput.value = user.creadorInfo?.support_link?user.creadorInfo?.support_link:"";
+                //console.log(usernameInput.value);
+                supportLinkInput.value = user.creadorInfo?.support_link ? user.creadorInfo?.support_link:"";
+                //console.log(user.creadorInfo);
+                //console.log(supportLinkInput.value);
                 //logoInput.src = user.creadorInfo?.logo?user.creadorInfo?.logo:"";
                 //img.src = user.logo;
             }
@@ -139,11 +143,12 @@ const iscreador = cookies.get("iscreador") !== undefined ? true : false;
     }
 
     async function getUserData(){
-        let user: userDetails;
-        if (isLocalStorageAvailable()) {
+        let user: userDetails | null;
+        user = null;
+        if (isLocalStorageAvailable() && false) {
             user = JSON.parse(localStorage.getItem("userDetails") as string);
         }
-        else{
+        if(user === null){
             const userData = await fetch("/api/auth/userdata",{
                 method: "POST"
             });
@@ -189,15 +194,46 @@ const iscreador = cookies.get("iscreador") !== undefined ? true : false;
         }
     }
     let actualUser: userDetails;
+
     getUserData().then((user) => {
-        actualUser = user;
-        updateContent(user);
+        if(user)
+        {
+            actualUser = user;
+            updateContent(user);
+        }
     });
 
     img?.addEventListener("click", () => {
         const input = document.querySelector("input[type='file']") as HTMLInputElement;
         input?.click();
     });
+    logoInput?.addEventListener('change', event => {
+        if (logoInput.files === null) return;
+        const [file] = logoInput.files;
+        const reader = new FileReader();
+
+        reader.addEventListener('load', event => {
+            if(img.src && event.target?.result !== null)
+            {
+                let value: string | ArrayBuffer | undefined = event.target?.result;
+
+                if (typeof value === 'string' ) {
+                    let stringValue: string = value;
+                    // Ahora puedes usar stringValue
+                    img.src = stringValue;
+                } else {
+                    // Manejar el caso en que value no es un string
+                }
+            }
+                
+        });
+
+        reader.addEventListener('error', event => {
+            console.log('error', event);
+        });
+
+        reader.readAsDataURL(file);
+        });
     form?.addEventListener("submit", (e) => {
         e.preventDefault();
         const formData = new FormData(form as HTMLFormElement);
