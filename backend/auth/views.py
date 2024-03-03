@@ -6,11 +6,13 @@ from django.contrib.auth import authenticate
 from core.models import Creador 
 from django.contrib.auth.models import UserManager
 from django.contrib.auth.models import User
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 class LoginAuthToken(APIView):
 
     def post(self, request, *args, **kwargs):
+        print(request.data)
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -18,11 +20,11 @@ class LoginAuthToken(APIView):
         password = serializer.validated_data['password']
         user = authenticate(username=email, password=password)
         creador = Creador.objects.filter(user=user).first()
-        
+        print(user)
 
         if not user:
             return Response({'error': 'Invalid email or password'}, status=400)
-        token, created = Token.objects.get_or_create(user=user)
+        refresh = RefreshToken.for_user(user=user)
         if not creador:
             creador_info = {
                 'logo': None,
@@ -38,7 +40,8 @@ class LoginAuthToken(APIView):
 
         print(user.email)
         return Response({
-            'token': token.key,
+            'refresh': str(refresh),
+            'token': str(refresh.access_token),
             'username': user.username,
             'email': user.email,
             'creadorInfo': creador_info,

@@ -1,3 +1,5 @@
+import type { Ref } from "preact";
+
 interface Props{
     placeholder?: string;   // Placeholder for the input
     name?: string;          // Name of the input
@@ -10,10 +12,11 @@ interface Props{
     id?: string;            // Id of the input
     isRequiered?: boolean;    // Whether the input is requiered
     myOnInput?: (e: Event) => void;   // Function to call when the input changes
-    // If you want to use onInput you should 
+    inputRef?: Ref<HTMLInputElement> ;   // Ref to the input
+    textareaRef?: Ref<HTMLTextAreaElement> ;   // Ref to the textarea
 }
 
-export default function Input({placeholder, extraClass, type, name, myOnInput, big, rows, cols, id, isRequiered, accept}: Props) {
+export default function Input({placeholder, extraClass, type, name, myOnInput, big, rows, cols, id, isRequiered, accept, inputRef, textareaRef}: Props) {
     const classes = ` w-64 lg:w-80 py-4 lg:py-5 bg-silver max-w-sm px-5 drop-shadow-sm transition-all ${extraClass}`
     const textAreaClasses =` w-80 bg-silver max-w-sm px-5 py-3 drop-shadow-sm transition-all resize-none ${extraClass}`
     function specialOnInput(e: Event) {
@@ -37,14 +40,16 @@ export default function Input({placeholder, extraClass, type, name, myOnInput, b
                 class=" opacity-0 absolute z-[-1]"
                 onChange={myOnInput}
                 id={id?id:"file-input"}
-                required/>
+                required
+                ref={inputRef}/>
                 :
                 <input 
                 type={type}
                 name={name}
                 class=" opacity-0 absolute z-[-1]"
                 onChange={myOnInput}
-                id={id?id:"file-input"}/>
+                id={id?id:"file-input"}
+                ref={inputRef}/>
             }
             
             </>
@@ -60,6 +65,7 @@ export default function Input({placeholder, extraClass, type, name, myOnInput, b
                     cols={cols}
                     id={id}
                     required
+                    ref={textareaRef}
                     ></textarea>
                     :
                     <textarea
@@ -70,6 +76,7 @@ export default function Input({placeholder, extraClass, type, name, myOnInput, b
                     rows={rows}
                     cols={cols}
                     id={id}
+                    ref={textareaRef}
                     ></textarea>
                     )
                 
@@ -82,7 +89,8 @@ export default function Input({placeholder, extraClass, type, name, myOnInput, b
                     name={name}
                     onChange={myOnInput}
                     id={id}
-                    required/>
+                    required
+                    ref={inputRef}/>
                     :
                     <input 
                     type={type?type:"text"}  
@@ -90,7 +98,8 @@ export default function Input({placeholder, extraClass, type, name, myOnInput, b
                     class={classes}
                     name={name}
                     onChange={myOnInput}
-                    id={id}/>
+                    id={id}
+                    ref={inputRef}/>
                     )
                 )
             )

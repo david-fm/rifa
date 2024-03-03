@@ -14,7 +14,7 @@ const serverURL = import.meta.env.API;
             <div class=" w-full flex justify-center items-center h-full">
                 <div class="w-80 flex flex-col justify-center items-center gap-8">
                     <div class="flex flex-col gap-4">
-                        <Input placeholder='Correo' type='username' extraClass='rounded-md' name='email' isRequiered/>
+                        <Input placeholder='Correo' type='email' extraClass='rounded-md' name='email' isRequiered/>
                         <Input placeholder='Contraseña' type='password' extraClass='rounded-md' name='password' isRequiered/>
                     </div>
                     <div class="flex flex-col gap-1 items-center">
@@ -32,18 +32,8 @@ const serverURL = import.meta.env.API;
 
 <script>
 
+import {$token, $refreshToken, $isCreador, $baseUser, $creadorInfo} from '../store.ts';
 
-function isLocalStorageAvailable() {
-    try {
-      // Local storage is available if the property exists
-      return typeof window.localStorage !== 'undefined';
-    } catch (error) {
-      // If window.localStorage exists but the user is blocking local
-      // storage, the attempting to read the property throws an exception.
-      // If this happens, consider local storage not available.
-      return false;
-    }
-  }
 const form = document.querySelector('form');
 const handleError = (err: any) => {
     const error = document.getElementById('error');
@@ -59,7 +49,7 @@ form?.addEventListener('submit', async (e) => {
     //console.log('submit');
     const formData = new FormData(form);
     const toSend = {
-        username: formData.get('email'),
+        email: formData.get('email'),
         password: formData.get('password')
     }
     // send form data
@@ -76,11 +66,16 @@ form?.addEventListener('submit', async (e) => {
     }
     else{
         res.json().then(data => {
-            if(isLocalStorageAvailable()){
-                localStorage.setItem('accessToken', data.access);
-                localStorage.setItem('refreshToken', data.refresh);
-                localStorage.setItem('userDetails', JSON.stringify(data));
-            }
+            $token.set(data.token);
+            $refreshToken.set(data.refresh);
+            $baseUser.setKey('username', data.username);
+            $baseUser.setKey('email', data.email);  
+            
+            $isCreador.set(data.isCreador);
+            $creadorInfo.setKey('logo', data.creadorInfo.logo);
+            $creadorInfo.setKey('support_link', data.creadorInfo.support_link);
+            $creadorInfo.setKey('support_type', data.creadorInfo.support_type);
+    
             window.location.href = '/dashboard';
         })
         
