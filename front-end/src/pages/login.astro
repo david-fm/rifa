@@ -32,7 +32,7 @@ const serverURL = import.meta.env.API;
 
 <script>
 
-import {$token, $refreshToken, $isCreador, $baseUser, $creadorInfo} from '../store.ts';
+import {$token, $refreshToken, $isCreador, $baseUser, $creadorInfo, $timeToken} from '../store.ts';
 
 const form = document.querySelector('form');
 const handleError = (err: any) => {
@@ -68,13 +68,14 @@ form?.addEventListener('submit', async (e) => {
         res.json().then(data => {
             $token.set(data.token);
             $refreshToken.set(data.refresh);
+            $timeToken.set(Date.now());
+
             $baseUser.setKey('username', data.username);
             $baseUser.setKey('email', data.email);  
             
             $isCreador.set(data.isCreador);
             $creadorInfo.setKey('logo', data.creadorInfo.logo);
             $creadorInfo.setKey('support_link', data.creadorInfo.support_link);
-            $creadorInfo.setKey('support_type', data.creadorInfo.support_type);
     
             window.location.href = '/dashboard';
         })

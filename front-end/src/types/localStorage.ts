@@ -15,5 +15,4 @@ export interface baseUser {
 export interface creadorInfo {
     logo: string|null;
     support_link: string|null;
-    support_type: number;
 }

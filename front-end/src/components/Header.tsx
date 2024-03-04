@@ -32,9 +32,11 @@ export default function Header({icon}: Props){
     }
 
     const logOut = () => {
-        
-        $baseUser.set({username: null, email: null}); 
-        $creadorInfo.set({logo: null, support_link: null, support_type: 0});
+        console.log("Logging out");
+        $baseUser.setKey("username", null);
+        $baseUser.setKey("email", null);
+        $creadorInfo.setKey("logo", null);
+        $creadorInfo.setKey("support_link", null);
         $isCreador.set(false);
         $token.set('');
         $refreshToken.set('');
@@ -56,7 +58,7 @@ export default function Header({icon}: Props){
                     <img src="/nav.svg" class="h-9 w-9 cursor-pointer lg:hidden" alt="Menu" id="toggler"  onClick={onToggleMenu} ref={toggler}/>
                     <nav class="hidden lg:flex lg:justify-evenly">
                         <a href="/dashboard" class="text-gray-700 transition-colors  ">Dashboard</a>
-                        <p  class="ml-4 text-gray-700 transition-colors cursor-pointer" id="signout">Logout</p>
+                        <p  class="ml-4 text-gray-700 transition-colors cursor-pointer" id="signout" onClick={logOut}>Logout</p>
                         <a href="/perfil" class="ml-4 text-gray-700 transition-colors">Perfil</a>
                     </nav>
                     

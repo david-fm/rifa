@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 from dotenv import load_dotenv
 import os
+from datetime import timedelta
 
 
 load_dotenv()
@@ -146,5 +147,14 @@ REST_FRAMEWORK = {
     ]
 }
 
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME" : timedelta(hours=1)
+}
+
 CORS_ALLOW_ALL_ORIGINS = bool(os.environ.get('CORS_ALLOW_ALL_ORIGINS', default=False))
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS').split(' ')
+
+# Media settings
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

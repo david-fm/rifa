@@ -412,3 +412,32 @@ const { title } = Astro.props;
     display: none;
   }
 </style>
+
+<script>
+  const serverURL = import.meta.env.PUBLIC_API;
+  import { $timeToken, $refreshToken, $token } from "../store";
+  const horas = 1;
+  console.log(((new Date()).getTime() - $timeToken.get())/1000/60/60);
+  if($refreshToken.get() && (new Date()).getTime() - $timeToken.get() > horas * 60 * 60 * 1000){
+    fetch(`${serverURL}api-auth/refresh-token/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        "refresh": $refreshToken.get()
+      })
+    }).
+    then(res => res.json()).
+    then(data => {
+      console.log(data);
+      if(data.access){
+        $token.set(data.access);
+        $timeToken.set(Date.now());
+      }
+    }).
+    catch(err => {
+      console.log(err);
+    });
+  }
+</script>

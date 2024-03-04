@@ -1,15 +1,19 @@
-import { $baseUser, $creadorInfo, $isCreador } from "../store";
+import { $baseUser, $creadorInfo, $isCreador, $token } from "../store";
 import { useStore } from "@nanostores/preact";
 import { useRef } from "preact/hooks";
 import Input from "./Input";
 import Button from "./Button";
 
+interface Props{
+    serverURL: string;
+}
 
-export default function EditPerfil() {
+export default function EditPerfil({serverURL}: Props) {
     
     const baseUserData = useStore($baseUser);
     const creadorData = useStore($creadorInfo);
     const isCreador = useStore($isCreador);
+    const token = useStore($token);
 
     
     
@@ -34,25 +38,12 @@ export default function EditPerfil() {
             $creadorInfo.setKey("logo", mydata.logo);
             $creadorInfo.setKey("support_link", mydata.support_link);
             $baseUser.setKey("username", mydata.username);
-            if(username.current && supportLink.current && img.current && logoInput.current && usernameInput.current && supportLinkInput.current){
-                
-                username.current.textContent = mydata.username;
-                supportLink.current.textContent = mydata.support_link;
-                //img.src = data.logo;
-
-                usernameInput.current.value = mydata.username;
-                supportLinkInput.current.value = mydata.support_link;
-                //logoInput.src = data.logo;
-            }
+            
         }
         else{
             const mydata = data as {username: string};
             $baseUser.setKey("username", mydata.username);
-            if(username.current && usernameInput.current){
-                
-                username.current.textContent = mydata.username;
-                usernameInput.current.value = mydata.username;
-            }
+            
         }
     }
 
@@ -60,10 +51,6 @@ export default function EditPerfil() {
     
     
     function handleOnChage(){
-        console.log('change');
-        console.log(logoInput.current);
-        console.log(logoInput.current?.files);
-        console.log(logoInput.current?.files?.length);
         if (logoInput.current && logoInput.current.files && logoInput.current.files.length > 0) 
         {
         console.log('change2');
@@ -100,9 +87,33 @@ export default function EditPerfil() {
     
         e.preventDefault();
         const formData = new FormData(e.target as HTMLFormElement);
-        fetch("/api/auth/edit", {
+
+        const toSend = new FormData();
+        if(formData.get("username") !== null && formData.get("username") !== "" && formData.get("username") !== baseUserData.username){
+            const usernameFormData = formData.get("username");
+            if (usernameFormData !== null && usernameFormData !== "" && usernameFormData !== baseUserData.username) {
+                toSend.append("username", usernameFormData.toString());
+            }
+        }
+        if(isCreador){
+            if(formData.get("support_link") !== null && formData.get("support_link") !== "" && formData.get("support_link") !== creadorData.support_link){
+                const supportLinkFormData = formData.get("support_link");
+                if (supportLinkFormData !== null && supportLinkFormData !== "" && supportLinkFormData !== creadorData.support_link) {
+                    toSend.append("support_link", supportLinkFormData.toString());
+                }
+            }
+            if(logoInput.current && logoInput.current.files && logoInput.current.files.length > 0){
+                const [file] = logoInput.current.files;
+                toSend.append("logo", file);
+            }
+
+        }
+        fetch(serverURL+"api/edit/", {
             method: "POST",
-            body: formData,
+            body: toSend,
+            headers: {
+                Authorization: 'Bearer ' + token
+            }
         }).then((res) => {
             if (res.ok) {
                 res.json().then((data) => {
@@ -116,7 +127,7 @@ export default function EditPerfil() {
         <div class="flex flex-col items-center justify-center w-96" ref={creador}>
             {
                 isCreador && (
-                <img src={creadorData.logo?creadorData.logo:"/defaultLogo.svg"} class="w-24 h-24 rounded-full cursor-pointer" id="img" ref={img} onClick={() =>logoInput.current?.click()}/>
+                <img src={serverURL + (creadorData.logo?creadorData.logo:"/defaultLogo.svg")} class="w-24 h-24 rounded-full cursor-pointer" id="img" ref={img} onClick={() =>logoInput.current?.click()}/>
                 )
 
             }
@@ -131,10 +142,10 @@ export default function EditPerfil() {
             <form class="pt-4 flex flex-col items-center" action="/api/auth/edit" ref={form} onSubmit={handleSubmission}>
                 
                 
-                <Input name="username" type="text" placeholder="Nombre de usuario"  isRequiered inputRef={usernameInput}/>
+                <Input name="username" type="text" placeholder="Nombre de usuario"   inputRef={usernameInput}/>
                 {
                     isCreador && (
-                        <Input name="support_link" type="text" placeholder="Link soporte" id="supportLinkInput" isRequiered inputRef={supportLinkInput}/>
+                        <Input name="support_link" type="text" placeholder="Link soporte" id="supportLinkInput"  inputRef={supportLinkInput}/>
                     )
                 }
                 {

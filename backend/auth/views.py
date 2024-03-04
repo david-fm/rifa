@@ -1,4 +1,3 @@
-from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializer import LoginSerializer, RegisterSerializer
@@ -12,7 +11,6 @@ from rest_framework_simplejwt.tokens import RefreshToken
 class LoginAuthToken(APIView):
 
     def post(self, request, *args, **kwargs):
-        print(request.data)
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -20,7 +18,6 @@ class LoginAuthToken(APIView):
         password = serializer.validated_data['password']
         user = authenticate(username=email, password=password)
         creador = Creador.objects.filter(user=user).first()
-        print(user)
 
         if not user:
             return Response({'error': 'Invalid email or password'}, status=400)
@@ -29,16 +26,13 @@ class LoginAuthToken(APIView):
             creador_info = {
                 'logo': None,
                 'support_link': None,
-                'support_type': None
             }
         else:
             creador_info = {
                 'logo': creador.logo.url if creador.logo else None,
                 'support_link': creador.support_link,
-                'support_type': creador.support_type
             }
 
-        print(user.email)
         return Response({
             'refresh': str(refresh),
             'token': str(refresh.access_token),

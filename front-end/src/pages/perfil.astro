@@ -2,10 +2,11 @@
 import Layout from "../layouts/Layout.astro";
 import EditPerfil from "../components/EditPerfil";
 
+const serverURL = import.meta.env.API;
 ---
 
 <Layout title="KingRifa">
     <div class="flex flex-col items-center justify-center h-full">
-        <EditPerfil client:load/>
+        <EditPerfil serverURL={serverURL} client:load/>
     </div>
 </Layout>
