@@ -414,8 +414,22 @@ const { title } = Astro.props;
 </style>
 
 <script>
+  
   const serverURL = import.meta.env.PUBLIC_API;
-  import { $timeToken, $refreshToken, $token } from "../store";
+  import { $timeToken, $refreshToken, $token, $baseUser, $creadorInfo, $isCreador } from "../store";
+
+  const logOut = () => {
+        console.log("Logging out");
+        $baseUser.setKey("username", null);
+        $baseUser.setKey("email", null);
+        $creadorInfo.setKey("logo", null);
+        $creadorInfo.setKey("support_link", null);
+        $isCreador.set(false);
+        $token.set('');
+        $refreshToken.set('');
+        window.location.href = "/api/auth/signout";
+    }
+
   const horas = 1;
   console.log(((new Date()).getTime() - $timeToken.get())/1000/60/60);
   if($refreshToken.get() && (new Date()).getTime() - $timeToken.get() > horas * 60 * 60 * 1000){
@@ -428,7 +442,12 @@ const { title } = Astro.props;
         "refresh": $refreshToken.get()
       })
     }).
-    then(res => res.json()).
+    then(res => {
+      if(res.status === 401){
+        throw new Error('Token no válido');
+      }
+      return res.json()
+    }).
     then(data => {
       console.log(data);
       if(data.access){
@@ -437,6 +456,9 @@ const { title } = Astro.props;
       }
     }).
     catch(err => {
+      if(err.message === 'Token no válido'){
+        logOut();
+      }
       console.log(err);
     });
   }

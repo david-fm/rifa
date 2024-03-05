@@ -4,6 +4,8 @@ from django_extensions.db.models import (
     TimeStampedModel,
     ActivatorModel)
 
+from django.dispatch import receiver
+
 from django.db.models import CheckConstraint, Q, F
 
 def user_directory_path(instance, filename):
@@ -25,7 +27,7 @@ class Creador(models.Model):
     # The link to the support page of the creator where it can be found
 
 
-class Campania(TimeStampedModel):
+class Campania(TimeStampedModel, AbstractBaseModel):
     creador = models.ForeignKey(Creador, on_delete=models.CASCADE)
     # The creator of the campaign
 
@@ -34,7 +36,7 @@ class Campania(TimeStampedModel):
 
     reglamento = models.TextField()
     # The rules of the campaign
-
+    # TODO: Controlar el tamaño de la imagen
     foto = models.ImageField(upload_to=campaign_directory_path)
     # The photo of the campaign
 
@@ -59,6 +61,8 @@ class Campania(TimeStampedModel):
     num_visibles = models.BooleanField()
     # If the user can select the tickets number
 
+    occupied_tickets = models.BinaryField()
+
     class Meta:
         constraints = [
             CheckConstraint(
@@ -82,21 +86,21 @@ class Campania(TimeStampedModel):
                 name='campania_tickets_necesarios_menor_o_igual_tickets'
             ),
             CheckConstraint(
-                # Test that the amount of tickets needed is less than max_reservas
-                check=Q(tickets_necesarios__lte=F('max_reservas')),
-                name='campania_tickets_necesarios_menor_o_igual_max_reservas'
+                # Test that the  max_reservas is less than the amount of tickets and greater than 0
+                check=Q(max_reservas__lte=F('cantidad_tickets'), max_reservas__gte=0),
+                name='campania_max_reservas_menor_o_igual_tickets'
             )
         ]
 
 
-class Premios(models.Model):
+class Premios(AbstractBaseModel):
     campania = models.ForeignKey(Campania, on_delete=models.CASCADE)
     # The campaign of the prize
 
     nombre = models.CharField(max_length=100)
     # The name of the prize
 
-class Ofertas(models.Model):
+class Ofertas(AbstractBaseModel):
     campania = models.ForeignKey(Campania, on_delete=models.CASCADE)
     # The campaign of the offer
     
@@ -120,16 +124,6 @@ class Ofertas(models.Model):
                 # Test that the amount of tickets needed is greater than 0
                 check=Q(cada__gte=0),
                 name='cada_no_negativo'
-            ),
-            CheckConstraint(
-                # Test that the amount of tickets needed is less than the amount of tickets
-                check=Q(cada__lte=F('campania__cantidad_tickets')),
-                name='cada_menor_o_igual_tickets'
-            ),
-            CheckConstraint(
-                # Test that cada is less than max_reservas
-                check=Q(cada__lte=F('campania__max_reservas')),
-                name='cada_menor_o_igual_max_reservas'
             )
         ]
 
@@ -157,10 +151,24 @@ class Reserva(TimeStampedModel):
                 # Test that the id_ticket is greater than 0
                 check=Q(id_ticket__gte=0),
                 name='cantidad_no_negativa'
-            ),
-            CheckConstraint(
-                # Test that the id_ticket is less or equal than the amount of tickets
-                check=Q(id_ticket__lte=F('campania__cantidad_tickets')),
-                name='cantidad_menor_o_igual_tickets'
             )
         ]
+
+
+@receiver(models.signals.pre_save, sender=Reserva)
+def check_reserva(sender, instance, **kwargs):
+    # Test that the id_ticket is less than the amount of tickets
+    if instance.id_ticket >= instance.campania.cantidad_tickets:
+        raise ValueError('The id_ticket is greater than the amount of tickets')
+
+
+@receiver(models.signals.pre_save, sender=Ofertas)
+def check_ofertas(sender, instance, **kwargs):
+    # Test that the amount of tickets needed is less than the amount of tickets
+    if instance.cada > instance.campania.cantidad_tickets:
+        raise ValueError('The amount of tickets needed is greater than the amount of tickets')
+    
+    # Test that cada is less than max_reservas
+    if instance.cada > instance.campania.max_reservas:
+        raise ValueError('The amount of tickets needed is greater than max_reservas')
+    
