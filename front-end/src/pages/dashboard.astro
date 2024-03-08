@@ -1,85 +1,13 @@
 ---
 
 import Layout from "../layouts/Layout.astro";
-import Image from "../components/Image";
-import { supabase } from "../lib/supabase";
+import DashboardContent from "../components/DashboardContent.tsx";
 
-const { cookies, redirect } = Astro;
-
-const accessToken = cookies.get("sb-access-token");
-const refreshToken = cookies.get("sb-refresh-token");
-
-interface Rifa {
-    foto: string;
-    nombre: string;
-    reglamento: string;
-    id: number;
-}
-/*
-if (!accessToken || !refreshToken) {
-  return redirect("/login");
-}
-
-const { data, error } = await supabase.auth.setSession({
-  refresh_token: refreshToken.value,
-  access_token: accessToken.value,
-});
-
-if (error) {
-  cookies.delete("sb-access-token", {
-    path: "/",
-  });
-  cookies.delete("sb-refresh-token", {
-    path: "/",
-  });
-
-  return redirect("/signin");
-}
-*/
-// TODO FETCH ON USER 
-const rifas = await fetch("http://localhost:4321/api/rifa/dashboard");
-// Intentar obtener campañas, si no tienes eres nuevo
-// si eres nuevo, mandarte a crear una campaña
-
-if (rifas.status !== 200 && rifas) {
-  return redirect("/rifa/crear");
-}
-const rifasData:Rifa[] = await rifas.json();
-function nameToPageName(name: string){
-    return name.toLowerCase().replace(" ", "-");
-}
 ---
+
 <Layout title="dashboard">
-  <div>
-    
-    <div class="flex justify-center items-center px-8">
-      <div class="h-full w-full flex flex-col justify-center items-center">
-          <h2>Tus rifas</h2>
-          <ul class="flex flex-col  max-w-screen-lg gap-12 items-center pt-6">
-            {rifasData.map((rifa) => (
-              <li class="hover:shadow-md hover:-translate-y-6 transition-all">
-                <a href={`/rifa/${rifa.id.toString()}`}>
-                <article class="flex flex-col items-center md:items-stretch md:flex-row gap-8">
-                  <Image classList="shrink-0" src={rifa.foto} alt={`Foto de la campaña ${rifa.nombre}`}/>
-                  
-                  <div>
-                    <h3 class=" text-3xl">{rifa.nombre}</h3>
-                    <p class=" max-h-36 overflow-y-hidden text-ellipsis test">{rifa.reglamento}</p>
-                  </div>
-                  
-                </article>
-                </a>
-              </li>
-            ))}
-          </ul>
-          <a href="/rifa/crear" class="absolute bottom-10 right-10">
-            
-            Crear una rifa
-          </a>
-        </div>
-      </div>
-    </div>
-    
   
+    
+  <DashboardContent client:load />
   
 </Layout>

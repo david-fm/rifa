@@ -6,11 +6,14 @@ import Prize from "./Prize"
 import Image from "./Image"
 import { useSignal } from "@preact/signals"
 import { useRef } from "preact/hooks"
+import { useStore } from "@nanostores/preact"
+import { $token } from "../store"
+const serverURL = import.meta.env.PUBLIC_API;
 
 
 export default function CreateForm() {
     // TODO CHECK IF THE FORM IS VALID BEFORE SUBMITTING
-
+    const accessToken = useStore($token);
     const signal = useSignal(0);
     const error = useSignal(false);
     const thersAFile = useSignal(false);
@@ -75,9 +78,7 @@ export default function CreateForm() {
         </div>)
 
     ]
-    function handleSubmition(){
-        form.current?.submit();
-    }
+    
 
     function handleFile(e: Event) {
         
@@ -97,6 +98,76 @@ export default function CreateForm() {
             reader.readAsDataURL(file);
         }
     }
+    function handleSubmition(){
+
+        const toSend: Record<string, string| Record<string, string>[]| string[]| Record<string,string|boolean>> = {};
+        const prizes = form.current?.querySelectorAll('.prize') as NodeListOf<HTMLInputElement>;
+
+        const prizesArray = Array.from(prizes).map(prize=>prize.value);
+        toSend['premios'] = prizesArray;
+
+        const discounts = form.current?.querySelectorAll('.discount') as NodeListOf<HTMLDivElement>;
+        const discountsArray = Array.from(discounts).map(discount=>{
+            const inputs = discount.querySelectorAll('input') as NodeListOf<HTMLInputElement>;
+            const toReturn: Record<string, string> = {};
+            inputs.forEach(input=>{
+                toReturn[input.name] = input.value;
+            });
+            return toReturn;
+        });
+        toSend['ofertas'] = discountsArray;
+
+        const campania = form.current?.querySelectorAll('.campania') as NodeListOf<HTMLInputElement> | NodeListOf<HTMLTextAreaElement> | NodeListOf<HTMLSelectElement> ;
+
+        const campaniaToSend: Record<string, string | boolean> = {};
+        campania.forEach(input => {
+            if (input.type === 'checkbox' && input instanceof HTMLInputElement) {
+                campaniaToSend[input.name] = input.checked;
+            } 
+            else if (input.tagName === 'SELECT' && input instanceof HTMLSelectElement) {
+                campaniaToSend[input.name] = input.value;
+            }
+            else {
+                campaniaToSend[input.name] = input.value;
+            }
+        });
+        toSend['campania'] = campaniaToSend;
+        
+        const image = form.current?.querySelector('input[type="file"]') as HTMLInputElement;
+        const file = image.files?.item(0);
+
+        const formData = new FormData();
+        if(file)
+            formData.append('foto', file);
+
+
+        fetch(`${serverURL}api/rifa/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
+                },
+                body: JSON.stringify(toSend)
+        }).then(r=>r.json()).then(r=>{
+            
+            formData.append('campania', r.campania)
+            // SEND THE IMAGE
+            fetch(`${serverURL}api/rifa/`,{
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`
+                },
+                body: formData
+            }).then(r=>{
+                if(r.status !== 200)
+                    //jump to catch
+                    throw new Error('Error');
+            }).catch(()=>console.log("Error al enviar la imagen de la rifa"))
+            
+            window.location.href = '/dashboard/';
+        
+        }).catch(e=>console.log(e));
+    }
     return (
         <div class="h-full w-full flex justify-center items-center">
             <div class="flex flex-col lg:flex-row-reverse max-w-screen-lg gap-10 lg:gap-32 items-center">
@@ -104,27 +175,27 @@ export default function CreateForm() {
                 
             <form action="" class="relative w-[400px] px-8 lg:px-0 top-0 left-0 pt-4 flex flex-col gap-6 " id="crea-rifa" ref={form}>
                 <div class={(signal.value==0?"flex flex-col gap-8 items-center":"hidden ")} id="container-0">
-                    <Input placeholder='Nombre de la rifa' name='nombre' isRequiered/>
+                    <Input extraClass="campania" placeholder='Nombre de la rifa' name='nombre' isRequiered/>
                     <Image src="" alt ="Imagen de la campaña" imgRef={toUpdate} classList={thersAFile.value?"":"hidden"}/>
                     
-                    <Input name='imagen' type='file' placeholder="Imagen de la campaña" extraClass='bg-white-smoke !drop-shadow-none cursor-pointer border-2' isRequiered myOnInput={handleFile}/>
+                    <Input  name='foto' type='file' placeholder="Imagen de la campaña" extraClass='bg-white-smoke !drop-shadow-none cursor-pointer border-2' isRequiered myOnInput={handleFile}/>
                     
-                    <Input placeholder='Reglamento de la campaña' name='reglamento' big rows={5} isRequiered/>
+                    <Input extraClass="campania" placeholder='Reglamento de la campaña' name='reglamento' big rows={5} isRequiered/>
                 </div>
                 
                 <div class={(signal.value==1?"flex flex-col gap-8 items-center":"hidden ")} id="container-1">
                     <div class="flex items-center justify-center gap-2 ">
                         <p class=" shrink-0">¿Esta activo?</p>
-                        <Input name='ranking-activo' type='checkbox' extraClass="w-auto" isRequiered/>
+                        <Input name='ranking_activo' type='checkbox' extraClass="w-auto campania" isRequiered/>
                     </div>
-                    <Input placeholder='Incentivos en el ranking' name='reglamento' big rows={5}  isRequiered/>
+                    <Input extraClass="campania" placeholder='Incentivos en el ranking' name='info_ranking' big rows={5}  isRequiered/>
                 </div>
                 <div class={(signal.value==2?"flex flex-col gap-8 items-center":"hidden ")} id="container-2">
-                    <Select form="crea-rifa" name="numero-de-ticket" isRequiered/>
+                    <Select form="crea-rifa" name="cantidad_tickets" extraClass="campania" isRequiered/>
                     
-                    <Input placeholder='Precio de los tickets' name='precio-ticket' isRequiered/>
-                    <Input placeholder='Maximo número de tickets' name='numero-ticket' isRequiered/>
-                    <Input placeholder="Tickets necesarios" name="tickets-necesarios" isRequiered/>
+                    <Input extraClass="campania" placeholder='Precio de los tickets' name='precio_ticket' isRequiered/>
+                    {/* {<Input extraClass="campania" placeholder='Compras maximas por usuario' name='max_reservas' isRequiered/>} */}
+                    <Input extraClass="campania" placeholder="Tickets necesarios" name="tickets_necesarios" isRequiered/>
                 </div>
                 <div class={(signal.value==3?"flex flex-col gap-8 items-center":"hidden ")} id="container-3">
                     <Discounts />

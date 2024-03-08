@@ -7,6 +7,9 @@ from django_extensions.db.models import (
 from django.dispatch import receiver
 
 from django.db.models import CheckConstraint, Q, F
+from django_resized import ResizedImageField
+
+
 
 def user_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
@@ -21,7 +24,7 @@ class Creador(models.Model):
     
     user = models.OneToOneField('auth.User', on_delete=models.CASCADE, primary_key=True, blank=True)
     # User is the base user model from django
-    logo = models.ImageField(upload_to=user_directory_path, null=True, blank=True)
+    logo = ResizedImageField(upload_to=user_directory_path, null=True, blank=True, size=[100, 100])
     # The logo of the creator
     support_link = models.URLField(max_length=200, null=True, blank=True)
     # The link to the support page of the creator where it can be found
@@ -37,17 +40,22 @@ class Campania(TimeStampedModel, AbstractBaseModel):
     reglamento = models.TextField()
     # The rules of the campaign
     # TODO: Controlar el tamaño de la imagen
-    foto = models.ImageField(upload_to=campaign_directory_path)
+    foto = models.ImageField(upload_to=campaign_directory_path, null=True, blank=True)
     # The photo of the campaign
 
     precio_ticket = models.DecimalField(max_digits=9, decimal_places=2)
     # The price of the ticket
 
-    cantidad_tickets = models.IntegerField()
+    
+    # cantidad_tickets es un valor que viene dado por un select de entre 0 y 5 que se traduce en la cantidad de tickets disponibles
+    # if choice == 0: cantidad_tickets = 99
+    # if choice == 1: cantidad_tickets = 999
+    # if choice == 2: cantidad_tickets = 9999
+    # if choice == 3: cantidad_tickets = 99999
+    # if choice == 4: cantidad_tickets = 999999
+    # if choice == 5: cantidad_tickets = 9999999
+    cantidad_tickets = models.IntegerField(choices=[(99, 0), (999,1), (9999,2), (99999,3), (999999,4), (9999999,5)])
     # The amount of tickets available
-
-    max_reservas = models.IntegerField(default=cantidad_tickets)
-    # The maximum amount of reservations allowed per user
 
     tickets_necesarios = models.IntegerField()
     # The amount of tickets needed to end the campaign
@@ -58,10 +66,10 @@ class Campania(TimeStampedModel, AbstractBaseModel):
     info_ranking = models.TextField()
     # The information of the ranking
 
-    num_visibles = models.BooleanField()
+    num_visibles = models.BooleanField(blank=True, default=False)
     # If the user can select the tickets number
 
-    occupied_tickets = models.BinaryField()
+    buyed_tickets = models.IntegerField(blank=True, default=0)
 
     class Meta:
         constraints = [
@@ -83,12 +91,17 @@ class Campania(TimeStampedModel, AbstractBaseModel):
             CheckConstraint(
                 # Test that the amount of tickets needed is less than the amount of tickets
                 check=Q(tickets_necesarios__lte=F('cantidad_tickets')),
-                name='campania_tickets_necesarios_menor_o_igual_tickets'
+                name='campania_tickets_necesarios_menor_o_igual_cantiad_tickets'
             ),
+            # CheckConstraint(
+            #     # Test that the  max_reservas is less than the amount of tickets and greater than 0
+            #     check=Q(max_reservas__lte=F('cantidad_tickets'), max_reservas__gte=0),
+            #     name='campania_max_reservas_menor_o_igual_tickets'
+            # ),
             CheckConstraint(
-                # Test that the  max_reservas is less than the amount of tickets and greater than 0
-                check=Q(max_reservas__lte=F('cantidad_tickets'), max_reservas__gte=0),
-                name='campania_max_reservas_menor_o_igual_tickets'
+                # Test that the buyed_tickets is lower than cantidad_tickets
+                check=Q(buyed_tickets__lt=F('cantidad_tickets')),
+                name="tickets_bought_lower_than_tickets_available"
             )
         ]
 
@@ -128,7 +141,7 @@ class Ofertas(AbstractBaseModel):
         ]
 
 
-class Reserva(TimeStampedModel):
+class Reserva(TimeStampedModel, AbstractBaseModel):
     campania = models.ForeignKey(Campania, on_delete=models.CASCADE)
     # The campaign of the reservation
 
@@ -154,6 +167,12 @@ class Reserva(TimeStampedModel):
             )
         ]
 
+@receiver(models.signals.post_save, sender=Reserva)
+def count_comprados(sender, instance:Reserva, **kwargs):
+    # update campania buyed_tickets
+    campania = instance.campania;
+    campania.buyed_tickets=F('buyed_tickets') + 1
+    campania.save()
 
 @receiver(models.signals.pre_save, sender=Reserva)
 def check_reserva(sender, instance, **kwargs):
@@ -169,6 +188,7 @@ def check_ofertas(sender, instance, **kwargs):
         raise ValueError('The amount of tickets needed is greater than the amount of tickets')
     
     # Test that cada is less than max_reservas
-    if instance.cada > instance.campania.max_reservas:
-        raise ValueError('The amount of tickets needed is greater than max_reservas')
-    
+    # if instance.cada > instance.campania.max_reservas:
+    #     raise ValueError('The amount of tickets needed is greater than max_reservas')
+
+

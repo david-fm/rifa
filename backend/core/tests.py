@@ -6,34 +6,6 @@ from django.contrib.auth.models import User
 
 class CampaniaTestCase(TestCase):
     # Test of the check constraints of the Campania model
-    # class Meta:
-    #     constraints = [
-    #         CheckConstraint(
-    #             # Test that the price is greater than 0
-    #             check=Q(precio_ticket__gte=0),
-    #             name='campania_precio_no_negativo'
-    #         ),
-    #         CheckConstraint(
-    #             # Test that the amount of tickets is greater than 0
-    #             check=Q(cantidad_tickets__gte=0),
-    #             name='campania_cantidad_no_negativa'
-    #         ),
-    #         CheckConstraint(
-    #             # Test that the amount of tickets needed is greater than 0
-    #             check=Q(tickets_necesarios__gte=0),
-    #             name='campania_tickets_necesarios_no_negativos'
-    #         ),
-    #         CheckConstraint(
-    #             # Test that the amount of tickets needed is less than the amount of tickets
-    #             check=Q(tickets_necesarios__lte=F('cantidad_tickets')),
-    #             name='campania_tickets_necesarios_menor_o_igual_tickets'
-    #         ),
-    #         CheckConstraint(
-            #     # Test that the  max_reservas is less than the amount of tickets and greater than 0
-            #     check=Q(max_reservas__lte=F('cantidad_tickets'), max_reservas__gte=0),
-            #     name='campania_max_reservas_menor_o_igual_tickets'
-            # )
-    #     ]
     def setUp(self) -> None:
         user = User.objects.create_user(username="test", email="test@gmail.com", password="test")
         creador = Creador.objects.create(user=user)
@@ -99,7 +71,7 @@ class CampaniaTestCase(TestCase):
         campania = Campania(nombre="TestCampania", precio_ticket=100, cantidad_tickets=100, tickets_necesarios=10, max_reservas=101, ranking_activo=False, num_visibles=False, info_ranking="Test", reglamento="Test",creador=creador)
         with self.assertRaises(Exception):
             campania.save()
-        
+    
 
 
 class ReservaTestCase(TestCase):
@@ -145,3 +117,12 @@ class ReservaTestCase(TestCase):
         reserva = Reserva(campania=campania, id_ticket=99, usuario=usuario)
         with self.assertRaises(Exception):
             reserva.save()
+    
+    def test_multiple_tickets_buyed_same_time_update_buyed_tickets(self):
+        campania = Campania.objects.get(nombre="TestCampania")
+        usuario1 = User.objects.get(username="test")
+
+        list_reservs = [Reserva(campania=campania, usuario=usuario1, id_ticket=i) for i in range(0,99)]
+
+        
+        

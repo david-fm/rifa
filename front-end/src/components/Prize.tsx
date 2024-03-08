@@ -18,7 +18,7 @@ export default function Prize() {
 
     return (
         <VaribleBlock manager={setNameChild}>
-                <Input placeholder="Premio" name={"premio"} isRequiered/>
+                <Input placeholder="Premio" name={"premio"} extraClass=" prize" isRequiered/>
         </VaribleBlock>
     )
 }
