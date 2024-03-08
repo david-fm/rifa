@@ -12,11 +12,12 @@ interface Props{
     id?: string;            // Id of the input
     isRequiered?: boolean;    // Whether the input is requiered
     myOnInput?: (e: Event) => void;   // Function to call when the input changes
+    onKeyUp?: (e: Event) => void;   // Function to call when the input changes
     inputRef?: Ref<HTMLInputElement> ;   // Ref to the input
     textareaRef?: Ref<HTMLTextAreaElement> ;   // Ref to the textarea
 }
 
-export default function Input({placeholder, extraClass, type, name, myOnInput, big, rows, cols, id, isRequiered, accept, inputRef, textareaRef}: Props) {
+export default function Input({placeholder, extraClass, type, name, myOnInput, big, rows, cols, id, isRequiered, accept, inputRef, textareaRef,onKeyUp}: Props) {
     const classes = ` w-64 lg:w-80 py-4 lg:py-5 bg-silver max-w-sm px-5 drop-shadow-sm transition-all ${extraClass}`
     const textAreaClasses =` w-80 bg-silver max-w-sm px-5 py-3 drop-shadow-sm transition-all resize-none ${extraClass}`
     function specialOnInput(e: Event) {
@@ -39,6 +40,7 @@ export default function Input({placeholder, extraClass, type, name, myOnInput, b
                 name={name}
                 class=" opacity-0 absolute z-[-1]"
                 onChange={myOnInput}
+                onKeyUp={onKeyUp}
                 id={id?id:"file-input"}
                 required
                 ref={inputRef}/>
@@ -48,6 +50,7 @@ export default function Input({placeholder, extraClass, type, name, myOnInput, b
                 name={name}
                 class=" opacity-0 absolute z-[-1]"
                 onChange={myOnInput}
+                onKeyUp={onKeyUp}
                 id={id?id:"file-input"}
                 ref={inputRef}/>
             }
@@ -61,6 +64,7 @@ export default function Input({placeholder, extraClass, type, name, myOnInput, b
                     class={textAreaClasses}
                     name={name}
                     onInput={(e)=>specialOnInput(e)}
+                    onKeyUp={onKeyUp}
                     rows={rows}
                     cols={cols}
                     id={id}
@@ -73,6 +77,7 @@ export default function Input({placeholder, extraClass, type, name, myOnInput, b
                     class={textAreaClasses}
                     name={name}
                     onInput={(e)=>specialOnInput(e)}
+                    onKeyUp={onKeyUp}
                     rows={rows}
                     cols={cols}
                     id={id}
@@ -88,6 +93,7 @@ export default function Input({placeholder, extraClass, type, name, myOnInput, b
                     class={classes}
                     name={name}
                     onChange={myOnInput}
+                    onKeyUp={onKeyUp}
                     id={id}
                     required
                     ref={inputRef}/>
@@ -98,6 +104,7 @@ export default function Input({placeholder, extraClass, type, name, myOnInput, b
                     class={classes}
                     name={name}
                     onChange={myOnInput}
+                    onKeyUp={onKeyUp}
                     id={id}
                     ref={inputRef}/>
                     )

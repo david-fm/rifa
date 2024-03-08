@@ -2,7 +2,7 @@
 interface Props {
 	title: string;
 }
-import Header from '../components/Header.tsx';
+import Header from '@/components/Header.tsx';
 
 const { title } = Astro.props;
 ---
@@ -16,11 +16,11 @@ const { title } = Astro.props;
 		<link rel="icon" type="image" href="/icon.jpg" />
 		<title>{title}</title>
 	</head>
-	<body class=" h-screen flex flex-col ">
+	<body class=" h-screen flex flex-col overflow-y-hidden">
 		<Header icon='icon.jpg' client:only client:load/>
-    <div class="general-container w-screen relative z-10">
+    <main class="general-container w-screen relative z-[5] h-full overflow-y-hidden">
       <slot />
-    </div>
+    </main>
 		
 	</body>
 </html>
@@ -416,19 +416,11 @@ const { title } = Astro.props;
 <script>
   
   const serverURL = import.meta.env.PUBLIC_API;
-  import { $timeToken, $refreshToken, $token, $baseUser, $creadorInfo, $isCreador } from "../store";
+  import { $timeToken, $refreshToken, $token} from "@/store";
 
-  const logOut = () => {
-        console.log("Logging out");
-        $baseUser.setKey("username", null);
-        $baseUser.setKey("email", null);
-        $creadorInfo.setKey("logo", null);
-        $creadorInfo.setKey("support_link", null);
-        $isCreador.set(false);
-        $token.set('');
-        $refreshToken.set('');
-        window.location.href = "/api/auth/signout";
-    }
+  import { logOut } from "@/lib/functions";
+
+  
 
   const horas = 1;
   //console.log(((new Date()).getTime() - $timeToken.get())/1000/60/60);

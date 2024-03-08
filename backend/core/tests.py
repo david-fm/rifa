@@ -16,11 +16,11 @@ class CampaniaTestCase(TestCase):
     def test_campania_precio_no_negativo(self):
         creador = Creador.objects.get(user__username="test")
         # Positive test
-        campania = Campania(nombre="TestCampania", precio_ticket=100, cantidad_tickets=100, tickets_necesarios=10, max_reservas=100, ranking_activo=False, num_visibles=False, info_ranking="Test", reglamento="Test",creador=creador)
+        campania = Campania(nombre="TestCampania", precio_ticket=100, cantidad_tickets=100, tickets_necesarios=10,  ranking_activo=False, num_visibles=False, info_ranking="Test", reglamento="Test",creador=creador)
         campania.save()
 
         # Negative test
-        campania = Campania(nombre="TestCampania", precio_ticket=-1, cantidad_tickets=100, tickets_necesarios=10, max_reservas=100, ranking_activo=False, num_visibles=False, info_ranking="Test", reglamento="Test",creador=creador)
+        campania = Campania(nombre="TestCampania", precio_ticket=-1, cantidad_tickets=100, tickets_necesarios=10,  ranking_activo=False, num_visibles=False, info_ranking="Test", reglamento="Test",creador=creador)
         with self.assertRaises(Exception):
             campania.save()
 
@@ -28,11 +28,11 @@ class CampaniaTestCase(TestCase):
         creador = Creador.objects.get(user__username="test")
 
         # Positive test
-        campania = Campania(nombre="TestCampania", precio_ticket=100, cantidad_tickets=100, tickets_necesarios=10, max_reservas=100, ranking_activo=False, num_visibles=False, info_ranking="Test", reglamento="Test",creador=creador)
+        campania = Campania(nombre="TestCampania", precio_ticket=100, cantidad_tickets=100, tickets_necesarios=10,  ranking_activo=False, num_visibles=False, info_ranking="Test", reglamento="Test",creador=creador)
         campania.save()
 
         # Negative test
-        campania = Campania(nombre="TestCampania", precio_ticket=100, cantidad_tickets=-1, tickets_necesarios=10, max_reservas=100, ranking_activo=False, num_visibles=False, info_ranking="Test", reglamento="Test",creador=creador)
+        campania = Campania(nombre="TestCampania", precio_ticket=100, cantidad_tickets=-1, tickets_necesarios=10,  ranking_activo=False, num_visibles=False, info_ranking="Test", reglamento="Test",creador=creador)
         with self.assertRaises(Exception):
             campania.save()
     
@@ -40,11 +40,11 @@ class CampaniaTestCase(TestCase):
         creador = Creador.objects.get(user__username="test")
 
         # Positive test
-        campania = Campania(nombre="TestCampania", precio_ticket=100, cantidad_tickets=100, tickets_necesarios=10, max_reservas=100, ranking_activo=False, num_visibles=False, info_ranking="Test", reglamento="Test",creador=creador)
+        campania = Campania(nombre="TestCampania", precio_ticket=100, cantidad_tickets=100, tickets_necesarios=10,  ranking_activo=False, num_visibles=False, info_ranking="Test", reglamento="Test",creador=creador)
         campania.save()
 
         # Negative test
-        campania = Campania(nombre="TestCampania", precio_ticket=100, cantidad_tickets=100, tickets_necesarios=-1, max_reservas=100, ranking_activo=False, num_visibles=False, info_ranking="Test", reglamento="Test",creador=creador)
+        campania = Campania(nombre="TestCampania", precio_ticket=100, cantidad_tickets=100, tickets_necesarios=-1,  ranking_activo=False, num_visibles=False, info_ranking="Test", reglamento="Test",creador=creador)
         with self.assertRaises(Exception):
             campania.save()
     
@@ -52,25 +52,25 @@ class CampaniaTestCase(TestCase):
         creador = Creador.objects.get(user__username="test")
 
         # Positive test
-        campania = Campania(nombre="TestCampania", precio_ticket=100, cantidad_tickets=100, tickets_necesarios=10, max_reservas=100, ranking_activo=False, num_visibles=False, info_ranking="Test", reglamento="Test",creador=creador)
+        campania = Campania(nombre="TestCampania", precio_ticket=100, cantidad_tickets=100, tickets_necesarios=10,  ranking_activo=False, num_visibles=False, info_ranking="Test", reglamento="Test",creador=creador)
         campania.save()
 
         # Negative test
-        campania = Campania(nombre="TestCampania", precio_ticket=100, cantidad_tickets=100, tickets_necesarios=101, max_reservas=100, ranking_activo=False, num_visibles=False, info_ranking="Test", reglamento="Test",creador=creador)
+        campania = Campania(nombre="TestCampania", precio_ticket=100, cantidad_tickets=100, tickets_necesarios=101,  ranking_activo=False, num_visibles=False, info_ranking="Test", reglamento="Test",creador=creador)
         with self.assertRaises(Exception):
             campania.save()
     
-    def test_campania_max_reservas_menor_o_igual_tickets(self):
-        creador = Creador.objects.get(user__username="test")
+    # def test_campania_max_reservas_menor_o_igual_tickets(self):
+    #     creador = Creador.objects.get(user__username="test")
 
-        # Positive test
-        campania = Campania(nombre="TestCampania", precio_ticket=100, cantidad_tickets=100, tickets_necesarios=10, max_reservas=100, ranking_activo=False, num_visibles=False, info_ranking="Test", reglamento="Test",creador=creador)
-        campania.save()
+    #     # Positive test
+    #     campania = Campania(nombre="TestCampania", precio_ticket=100, cantidad_tickets=100, tickets_necesarios=10,  ranking_activo=False, num_visibles=False, info_ranking="Test", reglamento="Test",creador=creador)
+    #     campania.save()
 
-        # Negative test
-        campania = Campania(nombre="TestCampania", precio_ticket=100, cantidad_tickets=100, tickets_necesarios=10, max_reservas=101, ranking_activo=False, num_visibles=False, info_ranking="Test", reglamento="Test",creador=creador)
-        with self.assertRaises(Exception):
-            campania.save()
+    #     # Negative test
+    #     campania = Campania(nombre="TestCampania", precio_ticket=100, cantidad_tickets=100, tickets_necesarios=10, max_reservas=101, ranking_activo=False, num_visibles=False, info_ranking="Test", reglamento="Test",creador=creador)
+    #     with self.assertRaises(Exception):
+    #         campania.save()
     
 
 
@@ -85,7 +85,7 @@ class ReservaTestCase(TestCase):
     def setUp(self) :
         user = User.objects.create_user(username="test", email="test@gmail.com", password="test")
         creador = Creador.objects.create(user=user)
-        campania = Campania.objects.create(nombre="TestCampania", precio_ticket=100, cantidad_tickets=100, tickets_necesarios=10, max_reservas=100, ranking_activo=False, num_visibles=False, creador=creador, info_ranking="Test", reglamento="Test")
+        campania = Campania.objects.create(nombre="TestCampania", precio_ticket=100, cantidad_tickets=100, tickets_necesarios=10,  ranking_activo=False, num_visibles=False, creador=creador, info_ranking="Test", reglamento="Test")
 
         user.save()
         creador.save()

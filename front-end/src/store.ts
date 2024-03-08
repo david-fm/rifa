@@ -35,3 +35,5 @@ export const $creadorInfo = persistentMap<creadorInfo>('creadorInfo', {
     decode: JSON.parse
 
 })
+
+export const $buying = persistentAtom<string>('buying', '')

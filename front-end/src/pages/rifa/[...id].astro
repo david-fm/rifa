@@ -1,86 +1,27 @@
 ---
-import Layout from "../../layouts/Layout.astro";
-import Image from "../../components/Image";
-
-import Perfil from "../../components/Perfil";
-import PercentageBar from "../../components/PercentageBar"
-import Buying from "../../components/Buying"
 export const prerender = false
 
-interface Rifa {
-    foto: string;
-    nombre: string;
-    precio_ticket: number;
-    cantidad_tickets:number;
-    max_reservas: number;
-    tickets_necesarios: number;
-    tickets_vendidos: number;
-    tipo_soporte: number;
-    link_soporte: string;
-    ranking_activo: boolean;
-    info_ranking: string;
-    num_visibles: boolean;
-    reglamento: string;
-}
+import Layout from "@/layouts/Layout.astro";
+import RifaView from "@/components/RifaView";
+
 const {id} = Astro.params;
-const rifa = await fetch(`http://localhost:4321/api/rifa/${id}`)
-const data: Rifa = await rifa.json()
-
-const { cookies, redirect } = Astro;
-
-const accessToken = cookies.get("sb-access-token");
-const refreshToken = cookies.get("sb-refresh-token");
-
-var loggedIn = false;
-if (accessToken && refreshToken) {
-    loggedIn = true;
-}
 
 ---
 
 <Layout title="dashboard">
-    <div class="h-full">
-      
-        <div class="flex justify-center items-center h-full px-8 lg:h-auto lg:pb-20">
-            <div class="flex flex-col w-full max-w-screen-lg items-start h-full lg:flex-row lg:items-center lg:gap-8 xl:gap-20 xl:max-w-screen-xl lg:h-auto">
-                <section class="pb-8 flex flex-col gap-8 border-slate-300 border-b-2 w-full lg:border-none">
-                    <div>
-                        <h1 class=" self-start">{data.nombre}</h1>
-                        <Image src={"/"+data.foto} alt="{data.nombre}" w="w-full" />
-                    </div>
-                    
-                    <div class="grid grid-cols-2 grid-rows-1 items-center w-full">
-                        <b>Sorteador</b> 
-                        <Perfil link="https://wa.me/34620930883" username="David.FM" classList=""/>
-                    </div>
-                    <div class="w-full">
-                        
-                        <div class="flex justify-between">
-                            <b>Tickets vendidos</b>
-                            <p>{data.tickets_vendidos}/{data.tickets_necesarios}</p>
-                            
-                        </div>
-                        <PercentageBar percentage={(data.tickets_vendidos*100/data.tickets_necesarios).toString()}/>
-                        
-                    </div>
-                    <div class="flex flex-col gap-3">
-                        <b>Reglamento</b>
-                        <p class="text-wrap">
-                            {data.reglamento}
-                        </p>
-                    </div>
-                    
-                </section>
-                <Buying 
-                    precio_ticket={data.precio_ticket} 
-                    cantidad_tickets={data.cantidad_tickets}
-                    max_reservas={data.max_reservas}
-                    num_visibles={data.num_visibles}
-                    loggedIn={loggedIn}
-                    client:idle/>
-            </div>
-        </div>
-    </div>
-      
+    
+    <RifaView rifa_id={id} client:load/>
     
 </Layout>
+
+<script>
+/*function findScroller(element: HTMLElement) {
+    element.onscroll = function() { console.log(element)}
+
+    Array.from(element.children).forEach((value: Element) => {
+        findScroller(value as HTMLElement);
+    });
+}
+
+findScroller(document.body);*/
+</script>

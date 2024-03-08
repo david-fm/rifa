@@ -8,7 +8,6 @@ class CampaniaSerializer(serializers.ModelSerializer):
         exclude = ['creador','id','buyed_tickets']
 
 
-
 class OfertasSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ofertas
@@ -27,3 +26,10 @@ class ReservaSerializer(serializers.ModelSerializer):
 class ImageSerializer(serializers.Serializer):
     campania = serializers.UUIDField()
     foto = serializers.ImageField()
+
+class BuySerializer(serializers.Serializer):
+    campania = serializers.UUIDField()
+    cantidad = serializers.IntegerField()
+
+class SearchSerializer(serializers.Serializer):
+    search = serializers.CharField(max_length=100)

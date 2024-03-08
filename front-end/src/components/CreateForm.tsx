@@ -10,6 +10,14 @@ import { useStore } from "@nanostores/preact"
 import { $token } from "../store"
 const serverURL = import.meta.env.PUBLIC_API;
 
+function Info({title, text}: {title: string, text: string}){
+    return(
+        <div class="w-[400px] px-8 lg:px-0 text-center">
+            <h2 class="pb-5">{title}</h2>
+            <p class="text-balance">{text}</p>
+        </div>
+    )
+}
 
 export default function CreateForm() {
     // TODO CHECK IF THE FORM IS VALID BEFORE SUBMITTING
@@ -56,26 +64,15 @@ export default function CreateForm() {
     }
 
     const info = [
-        (<div class="w-[400px] px-8 lg:px-0">
-            <h2 class="pb-5">Información general</h2>
-            <p class="text-balance">Información general sobre la campaña, Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum debitis possimus corporis, id soluta iste voluptatibus nam itaque quaerat nisi!</p>
-        </div>),
-        (<div class="w-[400px] px-8 lg:px-0">
-            <h2 class="pb-5">Ranking</h2>
-            <p class="text-balance">Información sobre el <b>ranking</b> de la campaña</p>
-        </div>),
-        (<div class="w-[400px] px-8 lg:px-0">
-            <h2 class="pb-5">Tickets</h2>
-            <p class="text-balance">Información sobre los <b>tickets</b></p>
-        </div>),
-        (<div class="w-[400px] px-8 lg:px-0">
-            <h2 class="pb-5">Descuentos</h2>
-            <p class="text-balance">Descuentos por cantidad de tickets</p>
-        </div>  ),
-        (<div class="w-[400px] px-8 lg:px-0">
-            <h2 class="pb-5">Premios</h2>
-            <p class="text-balance">Información sobre los premios</p>
-        </div>)
+        (<Info title="Información general" text="Información general sobre la campaña, Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum debitis possimus corporis, id soluta iste voluptatibus nam itaque quaerat nisi!"/>),
+        (
+        <Info title="Ranking" text="Información sobre el ranking de la campaña, Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum debitis possimus corporis, id soluta iste voluptatibus nam itaque quaerat nisi!"/>),
+        (
+        <Info title="Tickets" text="Información sobre los tickets, Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum debitis possimus corporis, id soluta iste voluptatibus nam itaque quaerat nisi!"/>),
+        (
+        <Info title="Descuentos" text="Información sobre los descuentos, Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum debitis possimus corporis, id soluta iste voluptatibus nam itaque quaerat nisi!"/>),
+        (
+        <Info title="Premios" text="Información sobre los premios, Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum debitis possimus corporis, id soluta iste voluptatibus nam itaque quaerat nisi!"/>),
 
     ]
     

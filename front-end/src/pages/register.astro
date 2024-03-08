@@ -16,7 +16,7 @@ const serverURL = import.meta.env.API;
 ---
 
 <Layout title="KingRifa">
-	<main class="h-full">
+	<div class="h-full overflow-auto">
         <form action={serverURL+"api-auth/register/"} id="form" class="h-full">
             <div class=" h-full w-full flex  justify-center items-center ">
                 <div class="flex flex-col gap-8 max-w-80">
@@ -35,7 +35,7 @@ const serverURL = import.meta.env.API;
                 
             </div>
         </form>
-	</main>
+	</div>
 </Layout>
 
 <script>

@@ -39,8 +39,9 @@ class Campania(TimeStampedModel, AbstractBaseModel):
 
     reglamento = models.TextField()
     # The rules of the campaign
-    # TODO: Controlar el tamaño de la imagen
+    
     foto = models.ImageField(upload_to=campaign_directory_path, null=True, blank=True)
+    # TODO: Controlar el tamaño de la imagen
     # The photo of the campaign
 
     precio_ticket = models.DecimalField(max_digits=9, decimal_places=2)
@@ -152,7 +153,7 @@ class Reserva(TimeStampedModel, AbstractBaseModel):
 
 
     def __str__(self):
-        return f'{self.usuario.username} - {self.campania.nombre} - {self.cantidad}'
+        return f'{self.usuario.username} - {self.campania.nombre} - {self.id_ticket}'
 
     class Meta:
         unique_together = ('campania', 'id_ticket')
@@ -167,12 +168,12 @@ class Reserva(TimeStampedModel, AbstractBaseModel):
             )
         ]
 
-@receiver(models.signals.post_save, sender=Reserva)
-def count_comprados(sender, instance:Reserva, **kwargs):
-    # update campania buyed_tickets
-    campania = instance.campania;
-    campania.buyed_tickets=F('buyed_tickets') + 1
-    campania.save()
+# @receiver(models.signals.post_save, sender=Reserva)
+# def count_comprados(sender, instance:Reserva, **kwargs):
+#     # update campania buyed_tickets
+#     campania = instance.campania;
+#     campania.buyed_tickets=F('buyed_tickets') + 1
+#     campania.save()
 
 @receiver(models.signals.pre_save, sender=Reserva)
 def check_reserva(sender, instance, **kwargs):

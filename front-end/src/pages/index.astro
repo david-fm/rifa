@@ -5,7 +5,7 @@ import ButtonInput from '../components/ButtonInput.tsx';
 ---
 
 <Layout title="KingRifa">
-	<main class="h-full">
+	<div class="h-full overflow-auto">
 		<div class=" h-full w-full flex flex-col justify-center items-center gap-4 ">
 			<a class=" relative w-fit h-fit z-10 " href="/rifa/crear">
 				<Button type='button' text='CREAR RIFA' extraClass=' rounded-sm drop-shadow-sm drop-shadow-none'></Button>
@@ -14,7 +14,7 @@ import ButtonInput from '../components/ButtonInput.tsx';
 			<ButtonInput client:load/>
 		</div>
 		
-	</main>
+	</div>
 </Layout>
 
 <script>
