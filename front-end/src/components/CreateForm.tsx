@@ -145,8 +145,13 @@ export default function CreateForm() {
                 'Authorization': `Bearer ${accessToken}`
                 },
                 body: JSON.stringify(toSend)
-        }).then(r=>r.json()).then(r=>{
-            
+        }).then(r=>{
+            if(r.status !== 201 && r.status !== 200)
+                //jump to catch
+                throw new Error('Error');
+            return r.json();
+        }).then(r=>{
+            console.log(r);
             formData.append('campania', r.campania)
             // SEND THE IMAGE
             fetch(`${serverURL}api/rifa/`,{
@@ -159,18 +164,19 @@ export default function CreateForm() {
                 if(r.status !== 200)
                     //jump to catch
                     throw new Error('Error');
-            }).catch(()=>console.log("Error al enviar la imagen de la rifa"))
-            
-            window.location.href = '/dashboard/';
+                
+                window.location.href = '/dashboard/';
+            }).catch((e)=>console.log(e))
+        
         
         }).catch(e=>console.log(e));
     }
     return (
-        <div class="h-full w-full flex justify-center items-center">
-            <div class="flex flex-col lg:flex-row-reverse max-w-screen-lg gap-10 lg:gap-32 items-center">
+        <div class="h-full w-full flex justify-center items-center pb-8">
+            <div class="flex flex-col lg:flex-row-reverse max-w-screen-lg gap-10 lg:gap-32 items-center h-full">
             {info[signal.value]}
                 
-            <form action="" class="relative w-[400px] px-8 lg:px-0 top-0 left-0 pt-4 flex flex-col gap-6 " id="crea-rifa" ref={form}>
+            <form action="" class="relative w-[400px] px-8 lg:px-0 top-0 left-0 pt-4 flex flex-col gap-6 h-full" id="crea-rifa" ref={form}>
                 <div class={(signal.value==0?"flex flex-col gap-8 items-center":"hidden ")} id="container-0">
                     <Input extraClass="campania" placeholder='Nombre de la rifa' name='nombre' isRequiered/>
                     <Image src="" alt ="Imagen de la campaña" imgRef={toUpdate} classList={thersAFile.value?"":"hidden"}/>

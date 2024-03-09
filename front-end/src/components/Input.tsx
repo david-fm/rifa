@@ -18,8 +18,8 @@ interface Props{
 }
 
 export default function Input({placeholder, extraClass, type, name, myOnInput, big, rows, cols, id, isRequiered, accept, inputRef, textareaRef,onKeyUp}: Props) {
-    const classes = ` w-64 lg:w-80 py-4 lg:py-5 bg-silver max-w-sm px-5 drop-shadow-sm transition-all ${extraClass}`
-    const textAreaClasses =` w-80 bg-silver max-w-sm px-5 py-3 drop-shadow-sm transition-all resize-none ${extraClass}`
+    const classes = ` w-64 lg:w-80 py-4 lg:py-5 bg-input-fondo text-input-texto placeholder:text-input-texto max-w-sm px-5 drop-shadow-sm transition-all ${extraClass}`
+    const textAreaClasses =` w-80 bg-input-fondo text-input-texto placeholder:text-input-texto max-w-sm px-5 py-3 drop-shadow-sm transition-all resize-none ${extraClass}`
     function specialOnInput(e: Event) {
         resizeTextarea(e);
         if(myOnInput)

@@ -1,3 +1,4 @@
+from typing import List
 from rest_framework.views import APIView
 from auth.serializer import ModifyUserSerializer
 from core.serializer import RifaSerializer, ImageSerializer, BuySerializer, SearchSerializer
@@ -8,6 +9,7 @@ from core.models import Creador, Campania, Premios, Ofertas, Reserva
 from collections import OrderedDict
 from django.db.models import F
 from random import randint
+
 
 
 # Create your views here.
@@ -21,78 +23,102 @@ class ModifyCreador(APIView, LoginRequiredMixin):
         if 'username' in data:
             user.username = data['username']
             user.save()
-        if 'logo' or 'support_link' in data:
-            creador = Creador.objects.get(user=user)
-
-            if not creador:
-                return Response({'error': 'User is not a creator'}, status=400)
-
-            
-
-            if 'logo' in data:
-                print('logo')
-                print(data['logo'])
-                creador.logo = data['logo']
-            
-            if 'support_link' in data:
-                creador.support_link = data['support_link']
-            
-            creador.save()
+        
+        
             
         response_data = {
             'username': user.username,
         }
-        if Creador.objects.filter(user=user).exists():
+        try:
             creador = Creador.objects.get(user=user)
+            if 'logo' or 'support_link' in data and data['logo'] or data['support_link']:
+                
+                if 'logo' in data and data['logo']:
+                    creador.logo = data['logo']
+                
+                if 'support_link' in data and data['support_link']:
+                    creador.support_link = data['support_link']
+                
+                creador.save()
+            
             response_data['logo'] =  creador.logo.url if creador.logo else None
             response_data['support_link'] = creador.support_link
+
+        except Creador.DoesNotExist:
+            pass
 
         return Response(response_data, status=200)
 
 
 def create_campania(data: OrderedDict, creador: Creador) -> Campania:
-    campania = Campania.objects.create(
-        nombre=data['nombre'],
-        reglamento=data['reglamento'],
-        precio_ticket=data['precio_ticket'],
-        cantidad_tickets=data['cantidad_tickets'],
-        tickets_necesarios=data['tickets_necesarios'],
-        ranking_activo=data['ranking_activo'],
-        info_ranking=data['info_ranking'],
-        # num_visibles=data['num_visibles'],
-        creador=creador
-    )
+    try:
+        campania = Campania.objects.create(
+            nombre=data['nombre'],
+            reglamento=data['reglamento'],
+            precio_ticket=data['precio_ticket'],
+            cantidad_tickets=data['cantidad_tickets'],
+            tickets_necesarios=data['tickets_necesarios'],
+            ranking_activo=data['ranking_activo'],
+            info_ranking=data['info_ranking'],
+            # num_visibles=data['num_visibles'],
+            creador=creador
+        )
+    except Exception as e:
+        print(e)
+        return None
     return campania
 
 def create_premio(data, campania: Campania) -> Premios:
-    premio = Premios.objects.create(
-        nombre=data,
-        campania=campania
-    )
+    try:
+        premio = Premios.objects.create(
+            nombre=data,
+            campania=campania
+        )
+    except Exception as e:
+        print(e)
+        return None
     return premio
 
 def create_oferta(data: OrderedDict, campania: Campania) -> Ofertas:
-    oferta = Ofertas.objects.create(
-        cada=data['cada'],
-        precio=data['precio'],
-        campania=campania
-    )
+    try:
+        oferta = Ofertas.objects.create(
+            cada=data['cada'],
+            precio=data['precio'],
+            campania=campania
+        )
+    except Exception as e:
+        print(e)
+        return None
     return oferta
 
+def choice_to_cantidad_tickets(choice: str) -> int:
+    if choice == '0': return 99
+    if choice == '1': return 999
+    if choice == '2': return 9999
+    if choice == '3': return 99999
+    if choice == '4': return 999999
+    if choice == '5': return 9999999
+    return 0
 
 class Rifa(APIView):
     def post(self, request):
 
         user = request.user
-        if not Creador.objects.filter(user=user.id).exists():
+
+        try:
+            creador = Creador.objects.get(user=user.id)
+        except Creador.DoesNotExist:
             return Response({'error': 'User is not a creator'}, status=400)
-        creador = Creador.objects.get(user=user.id)
         
-        serializer = RifaSerializer(data=request.data)
+        data = request.data
+        data['campania']['cantidad_tickets'] = choice_to_cantidad_tickets(data['campania']['cantidad_tickets'])
+
+        serializer = RifaSerializer(data=data)
         serializer.is_valid(raise_exception=True)
 
         data: OrderedDict = serializer.validated_data
         campania:Campania = create_campania(data['campania'], creador)
+        print(campania)
         premios = data['premios']
         ofertas = data['ofertas']
 
@@ -106,12 +132,14 @@ class Rifa(APIView):
 
     def patch(self, request):
         user = request.user
-        creador = Creador.objects.get(user=user.id)
-        if not creador:
+        try:
+            creador = Creador.objects.get(user=user.id)
+        except Creador.DoesNotExist:
             return Response({'error': 'User is not a creator'}, status=400)
-        
+        print("HOLA ")
         serializer = ImageSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        print("HOLAAA ")
 
         campania_id = serializer.validated_data['campania']
         foto = serializer.validated_data['foto']
@@ -155,8 +183,12 @@ class Rifa(APIView):
 
 class RifaDetail(APIView):
     def get(self, request, id):
-        campania : Campania = Campania.objects.get(id=id)
-        if not campania:
+        try:
+            campania : Campania = Campania.objects.get(id=id)
+            premios : List[Premios] = Premios.objects.filter(campania=campania)
+            ofertas : List[Ofertas] = Ofertas.objects.filter(campania=campania)
+
+        except Campania.DoesNotExist:
             return Response({'error': 'Campaign does not exist'}, status=400)
         
         # data will follow the following structure
@@ -188,6 +220,8 @@ class RifaDetail(APIView):
         data['ranking_activo'] = campania.ranking_activo
         data['info_ranking'] = campania.info_ranking
         data['reglamento'] = campania.reglamento
+        data['premios'] = [premio.nombre for premio in premios]
+        data['ofertas'] = [{'cada': oferta.cada, 'precio': oferta.precio} for oferta in ofertas]
 
         data['link_soporte'] = creador.support_link
         data['username_soporte'] = creador.user.username
@@ -217,37 +251,41 @@ class UserDashboard(APIView):
                 'id_campania': reserva.campania.id
             })
 
-        if not Creador.objects.filter(user=user.id).exists():
+            
+        try:
+            creador = Creador.objects.get(user=user.id)
+            campanias = Campania.objects.filter(creador=creador)
+
+            # Get next data from campanias and send it to the frontend
+            # interface Rifa {
+            #     foto: string;
+            #     nombre: string;
+            #     reglamento: string;
+            #     id: number;
+            # }
+
+            
+            for campania in campanias:
+
+                to_send['campanias'].append({
+                    'foto': campania.foto.url if campania.foto else None,
+                    'nombre': campania.nombre,
+                    'reglamento': campania.reglamento,
+                    'id': campania.id
+                })
+            
+            
+                
             return JsonResponse(to_send)
         
-        creador = Creador.objects.get(user=user.id)
-        campanias = Campania.objects.filter(creador=creador)
-
-        # Get next data from campanias and send it to the frontend
-        # interface Rifa {
-        #     foto: string;
-        #     nombre: string;
-        #     reglamento: string;
-        #     id: number;
-        # }
-
+        except Creador.DoesNotExist:
+            return JsonResponse(to_send)
         
-        for campania in campanias:
-
-            to_send['campanias'].append({
-                'foto': campania.foto.url if campania.foto else None,
-                'nombre': campania.nombre,
-                'reglamento': campania.reglamento,
-                'id': campania.id
-            })
-        
-        
-            
-        return JsonResponse(to_send)
 
 
 class BuyTicket(APIView):
     def post(self, request):
+        #TODO: TENER EN CUENTA LAS OFERTAS
         user = request.user
         if not user.is_authenticated:
             return Response({'error': 'User is not authenticated'}, status=400)
@@ -259,9 +297,10 @@ class BuyTicket(APIView):
         campania_id = serializer.validated_data['campania']
         cantidad = serializer.validated_data['cantidad']
 
-        campania = Campania.objects.get(id=campania_id)
-        
-        if not campania:
+        try:
+            campania = Campania.objects.get(id=campania_id)
+            id = campania.id
+        except Campania.DoesNotExist:
             return Response({'error': 'Campaign does not exist'}, status=400)
         
         try:
@@ -270,18 +309,30 @@ class BuyTicket(APIView):
 
         except Exception as e:
             return Response({'error': str(e)}, status=400)
-        
+        reservas = []
         for i in range(cantidad):
             while True:
                 id = randint(0, campania.cantidad_tickets)
                 try:
-                    reserva = Reserva.objects.create(
+                    reserva : Reserva = Reserva.objects.create(
                         campania=campania,
                         usuario=user,
                         id_ticket=id
                     )
-                    reserva.save()
+                    reservas.append(reserva)
                     break
                 except:
                     continue
+        
+        if len(reservas) != cantidad:
+            for reserva in reservas:
+                reserva.delete()
+            
+            
+            campania = Campania.objects.filter(id=id)
+            campania.update(buyed_tickets=F('buyed_tickets') - cantidad)
+  
+
+            return Response({'error': 'Error al comprar los tickets'}, status=400)
+
         return Response({'message': 'Tickets comprados correctamente'}, status=200)

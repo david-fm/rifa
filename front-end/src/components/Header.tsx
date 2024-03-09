@@ -52,7 +52,7 @@ export default function Header({icon}: Props){
     
     
     return(
-    <header class={`w-full  mx-auto px-8 py-4 flex justify-center z-10 bg-white-smoke sticky ${accessToken && refreshToken ? "top-0": "" }`} ref={header}>
+    <header class={`w-full  mx-auto px-8 py-4 flex justify-center z-10 bg-fondo sticky ${accessToken && refreshToken ? "top-0": "" }`} ref={header}>
         <div class="w-full max-w-screen-xl relative">
             {
                 accessToken && refreshToken ? 
@@ -61,33 +61,38 @@ export default function Header({icon}: Props){
                     
                     <a href="/">
                         <img src={"/"+icon} class
-                        ="h-14 w-14" alt="Logo" />
+                        ="w-40" alt="Logo" />
                     </a>
                     <img src="/nav.svg" class="h-9 w-9 cursor-pointer lg:hidden" alt="Menu" id="toggler"  onClick={onToggleMenu} ref={toggler}/>
                     <nav class="hidden lg:flex lg:justify-evenly">
-                        <a href="/dashboard" class="text-gray-700 transition-colors  ">
+                        <a href="/dashboard" class=" text-textos transition-colors  ">
                             {isCreador ? "Dashboard" : "Tus Tickets"}
                             
                         </a>
-                        <p  class="ml-4 text-gray-700 transition-colors cursor-pointer" id="signout" onClick={logOut}>Logout</p>
-                        <a href="/perfil" class="ml-4 text-gray-700 transition-colors">Perfil</a>
+                        <a href="/perfil" class="pb-1 ml-4 cursor-pointer">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 *:hover:stroke-textos " fill="none" viewBox="0 0 24 24"><path class=" stroke-input-texto  " stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M5 21a7 7 0 1 1 14 0M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z"/></svg>
+                        </a>
+                        <div class="pb-1 ml-4 cursor-pointer" onClick={logOut}>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 *:hover:stroke-textos" viewBox="-3.5 0 64 64"><g class="stroke-input-texto stroke-2  " fill="none" fill-rule="evenodd" transform="translate(1 1)"><path d="M38 32v20c0 1.1-.9 2-2 2h-3.6M1.9 0H36c1.1 0 2 .9 2 2v24"/><path d="M0 2C0 .9.9 0 2 0l28.1 8c1.1 0 2 .9 2 2v50c0 1.1-.9 2-2 2L2 54c-1.1 0-2-.9-2-2V2Z"/><circle cx="25.5" cy="34.5" r="1.5"/><path d="M48.2 33.7v3.7c0 .3-.2.6-.6.6l-11.7-7.8c-.3-.2-.6-.3-.6-.6v-1.1c0-.2.2-.4.6-.6L47.6 20c.3 0 .5.3.5.6V24M46.3 25H56M46.3 33H56"/></g></svg>
+                        </div>
+                        
                     </nav>
                     
                 </div>
-                <nav class="flex flex-col items-end absolute right-0 top-14 w-full max-w-screen-xl m-auto py-4 px-4 transition-all opacity-0 bg-white-smoke border-b-2 border-black after:absolute -translate-y-4 hidden" id="nav">
+                <nav class="flex flex-col items-end absolute right-0 top-14 w-full max-w-screen-xl m-auto py-4 px-4 transition-all opacity-0 bg-fondo border-b-2 border-black after:absolute -translate-y-4 hidden" id="nav">
                         
-                        <a href="/dashboard" class="text-gray-700 hover:border-black transition-colors border-b-2 ">
+                        <a href="/dashboard" class="text-textos hover:border-textos transition-colors border-b-2 ">
                         {isCreador ? "Dashboard" : "Tus Tickets"}
                         </a>
-                        <a href="/" class="text-gray-700 hover:border-black transition-colors border-b-2 ">
+                        <a href="/" class="text-textos hover:border-textos transition-colors border-b-2 ">
                             Inicio
                         </a>
                         <div class="pt-2 flex ">
-                            <a href="/api/auth/signout" class="pb-1 ml-4 " onClick={logOut}>
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 *:hover:stroke-black *:hover:stroke-[4]" viewBox="-3.5 0 64 64"><g class="stroke-gray-600 stroke-2  " fill="none" fill-rule="evenodd" transform="translate(1 1)"><path d="M38 32v20c0 1.1-.9 2-2 2h-3.6M1.9 0H36c1.1 0 2 .9 2 2v24"/><path d="M0 2C0 .9.9 0 2 0l28.1 8c1.1 0 2 .9 2 2v50c0 1.1-.9 2-2 2L2 54c-1.1 0-2-.9-2-2V2Z"/><circle cx="25.5" cy="34.5" r="1.5"/><path d="M48.2 33.7v3.7c0 .3-.2.6-.6.6l-11.7-7.8c-.3-.2-.6-.3-.6-.6v-1.1c0-.2.2-.4.6-.6L47.6 20c.3 0 .5.3.5.6V24M46.3 25H56M46.3 33H56"/></g></svg>
-                            </a>
-                            <a href="/perfil" class="pb-1 ml-4 ">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 *:hover:stroke-black *:hover:stroke-[2]" fill="none" viewBox="0 0 24 24"><path class="stroke-gray-600  " stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M5 21a7 7 0 1 1 14 0M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z"/></svg>
+                            <div class="pb-1 ml-4 cursor-pointer" onClick={logOut}>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 *:hover:stroke-textos" viewBox="-3.5 0 64 64"><g class="stroke-input-texto stroke-2  " fill="none" fill-rule="evenodd" transform="translate(1 1)"><path d="M38 32v20c0 1.1-.9 2-2 2h-3.6M1.9 0H36c1.1 0 2 .9 2 2v24"/><path d="M0 2C0 .9.9 0 2 0l28.1 8c1.1 0 2 .9 2 2v50c0 1.1-.9 2-2 2L2 54c-1.1 0-2-.9-2-2V2Z"/><circle cx="25.5" cy="34.5" r="1.5"/><path d="M48.2 33.7v3.7c0 .3-.2.6-.6.6l-11.7-7.8c-.3-.2-.6-.3-.6-.6v-1.1c0-.2.2-.4.6-.6L47.6 20c.3 0 .5.3.5.6V24M46.3 25H56M46.3 33H56"/></g></svg>
+                            </div>
+                            <a href="/perfil" class="pb-1 ml-4 cursor-pointer">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 *:hover:stroke-textos " fill="none" viewBox="0 0 24 24"><path class="stroke-input-texto  " stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M5 21a7 7 0 1 1 14 0M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z"/></svg>
                             </a>
                         </div>
                         
@@ -96,7 +101,7 @@ export default function Header({icon}: Props){
                 :
                 <div class=" flex justify-center items-center z-50">
                     <a href="/">
-                        <img src={"/"+icon} class="h-24 w-24" alt="Logo" />
+                        <img src={"/"+icon} class="w-40" alt="Logo" />
                     </a>
                 </div>
             }

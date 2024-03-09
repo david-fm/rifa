@@ -16,7 +16,7 @@ const serverURL = import.meta.env.API;
 ---
 
 <Layout title="KingRifa">
-	<div class="h-full overflow-auto">
+	<div class="h-full">
         <form action={serverURL+"api-auth/register/"} id="form" class="h-full">
             <div class=" h-full w-full flex  justify-center items-center ">
                 <div class="flex flex-col gap-8 max-w-80">
@@ -27,8 +27,8 @@ const serverURL = import.meta.env.API;
                         <Input name='passwordConfirmation' placeholder='Confirmar contraseña' type='password' extraClass='rounded-md' isRequiered/>
                     </div>
                     <div class="flex flex-col gap-1 items-center">
-                        <p class="hidden text-syracuse-orange text-justify text-xs" id="error"></p>
-                        <p>Ya tiene una cuenta: <a href="login" class=" text-syracuse-orange">Inicia sesion</a></p>
+                        <p class="hidden text-input-texto text-justify text-xs" id="error"></p>
+                        <p>Ya tiene una cuenta: <a href="login" class=" text-input-texto">Inicia sesion</a></p>
                         <Button type='submit' text='REGISTRARSE' extraClass='rounded-sm'>
                     </div>
                 </div>

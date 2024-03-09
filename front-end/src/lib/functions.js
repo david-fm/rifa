@@ -13,7 +13,6 @@ export function isLocalStorageAvailable() {
   }
 
 export  const logOut = () => {
-    console.log("Logging out");
     $baseUser.setKey("username", null);
     $baseUser.setKey("email", null);
     $creadorInfo.setKey("logo", null);
@@ -40,3 +39,11 @@ export const forbiddenOnLoggedIn = () => {
 }
 
 export const delay = ms => new Promise(res => setTimeout(res, ms));
+
+export function findScroller(element) {
+    element.onscroll = function() { console.log(element)}
+
+    Array.from(element.children).forEach((value) => {
+        findScroller(value);
+    });
+}

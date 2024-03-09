@@ -24,7 +24,7 @@ class Creador(models.Model):
     
     user = models.OneToOneField('auth.User', on_delete=models.CASCADE, primary_key=True, blank=True)
     # User is the base user model from django
-    logo = ResizedImageField(upload_to=user_directory_path, null=True, blank=True, size=[100, 100])
+    logo = ResizedImageField(upload_to=user_directory_path, null=True, blank=True, size=[200, 200],crop=['middle', 'center'])
     # The logo of the creator
     support_link = models.URLField(max_length=200, null=True, blank=True)
     # The link to the support page of the creator where it can be found
@@ -55,7 +55,7 @@ class Campania(TimeStampedModel, AbstractBaseModel):
     # if choice == 3: cantidad_tickets = 99999
     # if choice == 4: cantidad_tickets = 999999
     # if choice == 5: cantidad_tickets = 9999999
-    cantidad_tickets = models.IntegerField(choices=[(99, 0), (999,1), (9999,2), (99999,3), (999999,4), (9999999,5)])
+    cantidad_tickets = models.IntegerField(choices=[(99, "0"), (999,"1"), (9999,"2"), (99999,"3"), (999999,"4"), (9999999,"5")])
     # The amount of tickets available
 
     tickets_necesarios = models.IntegerField()
@@ -91,7 +91,7 @@ class Campania(TimeStampedModel, AbstractBaseModel):
             ),
             CheckConstraint(
                 # Test that the amount of tickets needed is less than the amount of tickets
-                check=Q(tickets_necesarios__lte=F('cantidad_tickets')),
+                check=Q(tickets_necesarios__lte=F('cantidad_tickets')+1),
                 name='campania_tickets_necesarios_menor_o_igual_cantiad_tickets'
             ),
             # CheckConstraint(

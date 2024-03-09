@@ -8,7 +8,7 @@ interface Props{
 
 export default function Select({form, name, extraClass, isRequiered}: Props) {
     const selectRef = useRef<HTMLSelectElement>(null);
-    const classes = `w-80 bg-silver max-w-sm px-5 py-3 drop-shadow-sm transition-all ${extraClass}`
+    const classes = `w-80 bg-silver max-w-sm px-5 py-3 drop-shadow-sm transition-all bg-input-fondo text-input-texto ${extraClass}`
 
     const testNotDefault = (e: Event) => {
         

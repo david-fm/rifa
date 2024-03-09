@@ -29,7 +29,7 @@ export default function DashboardContent() {
     
     const rifasData: Signal<Rifa[]> = useSignal<Rifa[]>([]);
     const ticketsData: Signal<{ [id_campania: string]: Ticket[] }> = useSignal<{ [id_campania: string]: Ticket[] }>({});
-    const watching = useSignal<'rifas' | 'tickets'>('rifas');
+    const watching = useSignal<'rifas' | 'tickets'>(isCreador ? 'rifas' : 'tickets');
 
     const ticketsToTicketsData = (tickets: Ticket[]) => {
         const ticketsData: { [id_campania: number]: Ticket[] } = {};
@@ -53,26 +53,26 @@ export default function DashboardContent() {
         })
         .then(response => response.json())
         .then(data => {
+            console.log(data);
             rifasData.value = data.campanias;
             ticketsData.value = ticketsToTicketsData(data.tickets);
-            console.log(ticketsData.value);
         });
     }, []);
 
     return (
-        <div class="h-full overflow-auto">
+        <div class="h-full">
     
         <div class="flex flex-col justify-center items-center px-8">
         <div class="flex justify-center items-center gap-8">
             {isCreador ?
                 <>
                 <h2 
-                class={"border-b-2 hover:border-black cursor-pointer"+ (watching.value === 'rifas' ? " border-black" : "")}
+                class={"border-b-2 hover:border-textos cursor-pointer"+ (watching.value === 'rifas' ? " border-textos" : "")}
                 onClick={()=>watching.value = 'rifas'}>
                     Tus Rifas
                 </h2>
                 <h2 
-                class={"border-b-2 hover:border-black cursor-pointer"+ (watching.value === 'tickets' ? " border-black" : "")}
+                class={"border-b-2 hover:border-textos cursor-pointer"+ (watching.value === 'tickets' ? " border-textos" : "")}
                 onClick={()=>watching.value = 'tickets'}>
                     Tus Tickets
                 </h2>

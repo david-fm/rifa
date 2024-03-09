@@ -33,3 +33,9 @@ class BuySerializer(serializers.Serializer):
 
 class SearchSerializer(serializers.Serializer):
     search = serializers.CharField(max_length=100)
+
+class TestSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Campania
+        fields = ['cantidad_tickets']

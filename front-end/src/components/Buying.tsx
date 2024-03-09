@@ -6,10 +6,14 @@ import { useStore } from "@nanostores/preact";
 
 const serverURL = import.meta.env.PUBLIC_API;
 
-
+interface Ofertas {
+    precio: number;
+    cada: number;
+}
 interface Props{
     precio_ticket: number;
     tickets_disponibles:number;
+    ofertas: [Ofertas];
     
     loggedIn: boolean;
 
@@ -19,7 +23,20 @@ interface Props{
 const comprados = signal(0);
 const pagando = signal(false);
 
-export default function Buying({precio_ticket, tickets_disponibles, loggedIn, ticket_id}:Props){
+function minPrize(precio_ticket:number, ofertas:[Ofertas], comprados:number){
+    // Ofertas es un array de objetos con dos propiedades: precio y cada
+    // Se aplica la oferta por cada cantidad de tickets
+    // Dado un cada 10 y precio 5 y el precio_ticket es 10, si compras 15 tickets, el precio es 10*5+5*10
+    let min = precio_ticket*comprados;
+    for(const oferta of ofertas)
+    {
+        const cantidad = Math.floor(comprados/oferta.cada);
+        min = Math.min(min, precio_ticket*comprados - oferta.precio*cantidad);
+    }
+    return min;
+}
+
+export default function Buying({precio_ticket, tickets_disponibles, loggedIn, ticket_id, ofertas}:Props){
     const token = useStore($token);
     effect(()=>{comprados.value<0?comprados.value=0:null})
     effect(()=>{comprados.value>tickets_disponibles?comprados.value=tickets_disponibles:null})
@@ -40,8 +57,10 @@ export default function Buying({precio_ticket, tickets_disponibles, loggedIn, ti
                         campania: ticket_id,
                         cantidad: comprados.value
                     })
+                }).then(r => {
+                    if(r.ok)
+                        window.location.replace("/dashboard");
                 })
-                alert("Redirigiendo a la pasarela de pago...");
                 
             }
             else
@@ -61,7 +80,7 @@ export default function Buying({precio_ticket, tickets_disponibles, loggedIn, ti
     return(
         <>
         <div class="w-full sticky self-start top-0">
-            <section class="py-8 flex flex-col gap-3 border-slate-300 border-b-2 w-full">
+            <section class="py-8 flex flex-col gap-3 border-barra border-b-2 w-full">
                 <h2 class="text-center">Cantidad de Tickets</h2>
                 <div class="grid grid-cols-2 grid-rows-2 gap-y-8 gap-x-12">
                     <Block onClick={()=>{comprados.value+=1}} text="+ 01" textButton="Añadir"/>
@@ -79,8 +98,22 @@ export default function Buying({precio_ticket, tickets_disponibles, loggedIn, ti
                 <div class="flex justify-between">
                     <p>Precio x Numero</p><p>{precio_ticket}€</p>
                 </div>
+                <div class="flex flex-col justify-between">
+                    <p>Ofertas</p>
+                    {
+                        ofertas.length>0?
+                        <ul class="list-disc list-inside text-input-texto">
+                            
+                            {ofertas?.map((oferta)=>{
+                                return <li>{oferta.cada} tickets por {oferta.precio}€</li>
+                            })}
+                        </ul>
+                        :<p>No hay ofertas</p>
+                    
+                    }
+                </div>
                 <div class="flex justify-between">
-                <p>Precio x Numero</p><p>{precio_ticket*comprados.value}€</p>
+                <p>Precio Total</p><p>{minPrize(precio_ticket,ofertas,comprados.value)}€</p>
                 </div>
                 <Button text="PAGAR" type="button" extraClass="justify-center w-auto mt-5 mx-auto hover:-translate-y-3 hover:shadow-lg transition-all" onClick={handlePagar}/>
             </section>
