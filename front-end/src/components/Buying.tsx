@@ -1,6 +1,8 @@
 import Block from "./Block";
 import Button from "./Button";
-import { effect, signal } from "@preact/signals";
+import { effect } from "@preact/signals";
+import { useSignal } from "@preact/signals";
+import { useEffect } from "preact/hooks";
 import { $buying, $token } from "@/store";
 import { useStore } from "@nanostores/preact";
 
@@ -20,26 +22,43 @@ interface Props{
     ticket_id: string | undefined;
 }
 
-const comprados = signal(0);
-const pagando = signal(false);
+
 
 function minPrize(precio_ticket:number, ofertas:[Ofertas], comprados:number){
-    // Ofertas es un array de objetos con dos propiedades: precio y cada
-    // Se aplica la oferta por cada cantidad de tickets
-    // Dado un cada 10 y precio 5 y el precio_ticket es 10, si compras 15 tickets, el precio es 10*5+5*10
-    let min = precio_ticket*comprados;
-    for(const oferta of ofertas)
+    // Calcula el precio mínimo de los tickets comprados basado en las ofertas
+    let precio = 0;
+    for(const oferta of ofertas.toSorted((a,b)=>(-(a.cada-b.cada))))
     {
         const cantidad = Math.floor(comprados/oferta.cada);
-        min = Math.min(min, precio_ticket*comprados - oferta.precio*cantidad);
+        precio += cantidad*oferta.precio;
+        comprados -= cantidad*oferta.cada;
+
+        if(comprados===0)
+            break;
     }
-    return min;
+    precio += comprados*precio_ticket;
+    return precio;
 }
 
 export default function Buying({precio_ticket, tickets_disponibles, loggedIn, ticket_id, ofertas}:Props){
+    const comprados = useSignal(0);
+    const pagando = useSignal(false);
+
     const token = useStore($token);
     effect(()=>{comprados.value<0?comprados.value=0:null})
-    effect(()=>{comprados.value>tickets_disponibles?comprados.value=tickets_disponibles:null})
+    
+    
+    useEffect(()=>{
+        
+        // Si el usuario intenta comprar tickets negativos 
+        // o más de los disponibles, se ajusta
+
+        if(comprados.value<0)
+            comprados.value=0;
+        if(comprados.value>tickets_disponibles)
+            comprados.value=tickets_disponibles;
+    }
+    ,[tickets_disponibles])
 
     function handlePagar(){
 

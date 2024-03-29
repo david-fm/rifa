@@ -1,4 +1,4 @@
-import { $baseUser, $creadorInfo, $isCreador, $token, $refreshToken } from '@/store';
+import { $baseUser, $creadorInfo, $isCreador, $token, $refreshToken, $alert } from '@/store';
 
 export function isLocalStorageAvailable() {
     try {
@@ -28,8 +28,24 @@ const RESTRICTED_PAGES = ["/dashboard","/perfil","/rifa/crear"];
 export const logInRequired = () => {
     if (! $token.get() || !$refreshToken.get()) {
       if (RESTRICTED_PAGES.includes(window.location.pathname)) 
+      {
+        $alert.set("Debes iniciar sesión para acceder a esta página");
         window.location.href = "/login";
+      }
+
     }
+}
+
+const CREATOR_PAGES = ["/rifa/crear"];
+export const fullInfoCreadorRequired = () => {
+  if (!$isCreador.get() || !$creadorInfo.get("logo") || !$creadorInfo.get("support_link")) {
+    if (CREATOR_PAGES.includes(window.location.pathname)) 
+    {
+      $alert.set("Debes ser un creador y completar tu información de creador para acceder a esta página");
+      window.location.href = "/perfil";
+    }
+    
+  }
 }
 
 export const forbiddenOnLoggedIn = () => {

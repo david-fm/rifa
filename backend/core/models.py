@@ -3,13 +3,16 @@ from utils.model_abstracts import AbstractBaseModel
 from django_extensions.db.models import (
     TimeStampedModel,
     ActivatorModel)
+from django.conf import settings
 
 from django.dispatch import receiver
 
-from django.db.models import CheckConstraint, Q, F
+from django.db.models import CheckConstraint, Q, F, Count
 from django_resized import ResizedImageField
+from django.contrib.auth import get_user_model
 
 
+User = get_user_model()
 
 def user_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
@@ -22,12 +25,22 @@ def campaign_directory_path(instance, filename):
 # Create your models here.
 class Creador(models.Model):
     
-    user = models.OneToOneField('auth.User', on_delete=models.CASCADE, primary_key=True, blank=True)
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE, 
+        primary_key=True, 
+        blank=True)
+    
     # User is the base user model from django
     logo = ResizedImageField(upload_to=user_directory_path, null=True, blank=True, size=[200, 200],crop=['middle', 'center'])
     # The logo of the creator
     support_link = models.URLField(max_length=200, null=True, blank=True)
     # The link to the support page of the creator where it can be found
+
+    class Meta:
+        permissions = [
+            ('is_creador', 'Is creador')
+        ]
 
 
 class Campania(TimeStampedModel, AbstractBaseModel):
@@ -91,7 +104,7 @@ class Campania(TimeStampedModel, AbstractBaseModel):
             ),
             CheckConstraint(
                 # Test that the amount of tickets needed is less than the amount of tickets
-                check=Q(tickets_necesarios__lte=F('cantidad_tickets')+1),
+                check=Q(tickets_necesarios__lte=F('cantidad_tickets')),
                 name='campania_tickets_necesarios_menor_o_igual_cantiad_tickets'
             ),
             # CheckConstraint(
@@ -105,6 +118,11 @@ class Campania(TimeStampedModel, AbstractBaseModel):
                 name="tickets_bought_lower_than_tickets_available"
             )
         ]
+    
+        
+    def ranking(self, top:int):
+        """Return the usernames that have bought more tickets in the campaign"""
+        return User.objects.annotate(reservas=Count('reserva', filter=Q(reserva__campania=self))).filter(reservas__gt=0).order_by('-reservas')[:top].values('username')
 
 
 class Premios(AbstractBaseModel):
@@ -146,7 +164,9 @@ class Reserva(TimeStampedModel, AbstractBaseModel):
     campania = models.ForeignKey(Campania, on_delete=models.CASCADE)
     # The campaign of the reservation
 
-    usuario = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.CASCADE)
     # The user of the reservation
 
     id_ticket = models.IntegerField()

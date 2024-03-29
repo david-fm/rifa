@@ -1,16 +1,21 @@
 from django.test import TestCase
 from core.models import Campania, Reserva, Creador
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 
+User = get_user_model()
 # Create your tests here.
 
 class CampaniaTestCase(TestCase):
     # Test of the check constraints of the Campania model
     def setUp(self) -> None:
         user = User.objects.create_user(username="test", email="test@gmail.com", password="test")
+        user2 = User.objects.create_user(username="test2", email="test2@gmail.com", password="test2")
+        user3 = User.objects.create_user(username="test3", email="test3@gmail.com", password="test3")
         creador = Creador.objects.create(user=user)
-
+        
         user.save()
+        user2.save()
+        user3.save()
         creador.save()
     
     def test_campania_precio_no_negativo(self):
@@ -60,6 +65,52 @@ class CampaniaTestCase(TestCase):
         with self.assertRaises(Exception):
             campania.save()
     
+    def test_ranking(self):
+        """Test the ranking method of the Campania model"""
+        creador = Creador.objects.get(user__username="test")
+        campania = Campania(nombre="TestCampania", precio_ticket=100, cantidad_tickets=100, tickets_necesarios=10,  ranking_activo=False, num_visibles=False, info_ranking="Test", reglamento="Test",creador=creador)
+        campania.save()
+
+        # Positive test
+        ranking = campania.ranking(10)
+        # print(f"ranking: {ranking}")
+        # print(f"Length ranking: {len(ranking)}")
+        # print(f"Reservas: {Reserva.objects.all()}")
+        self.assertEqual(len(ranking), 0)
+
+        # Negative test
+        ranking = campania.ranking(10)
+        
+        self.assertNotEqual(len(ranking), 1)
+
+    def test_multiple_buyers_ranking(self):
+        from .views import create_reserva
+        creador = Creador.objects.get(user__username="test")
+        campania = Campania(nombre="TestCampania", precio_ticket=100, cantidad_tickets=100, tickets_necesarios=10,  ranking_activo=False, num_visibles=False, info_ranking="Test", reglamento="Test",creador=creador)
+        campania.save()
+        user = User.objects.get(username="test")
+        user2 = User.objects.get(username="test2")
+        user3 = User.objects.get(username="test3")
+
+        reserva = create_reserva(campania, user)
+        reserva = create_reserva(campania, user)
+        reserva = create_reserva(campania, user2)
+        reserva = create_reserva(campania, user2)
+        reserva = create_reserva(campania, user2)
+        reserva = create_reserva(campania, user3)
+        
+        ranking = campania.ranking(3)
+        #print(f"ranking: {ranking}")
+        # Take the first user in the ranking
+        self.assertEqual(ranking[0].get('username'), user2.username)
+
+        # Take the second user in the ranking
+        self.assertEqual(ranking[1].get('username'), user.username)
+
+        # Take the third user in the ranking
+        self.assertEqual(ranking[2].get('username'), user3.username)
+        
+        
     # def test_campania_max_reservas_menor_o_igual_tickets(self):
     #     creador = Creador.objects.get(user__username="test")
 

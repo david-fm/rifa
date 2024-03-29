@@ -37,3 +37,5 @@ export const $creadorInfo = persistentMap<creadorInfo>('creadorInfo', {
 })
 
 export const $buying = persistentAtom<string>('buying', '')
+
+export const $alert = persistentAtom<string>('alert', '')

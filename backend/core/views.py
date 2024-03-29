@@ -1,13 +1,13 @@
 from typing import List
 from rest_framework.views import APIView
-from auth.serializer import ModifyUserSerializer
+from myauth.serializer import ModifyUserSerializer
 from core.serializer import RifaSerializer, ImageSerializer, BuySerializer, SearchSerializer
 from rest_framework.response import Response
 from django.http import JsonResponse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from core.models import Creador, Campania, Premios, Ofertas, Reserva
 from collections import OrderedDict
-from django.db.models import F
+from django.db.models import F, Count
 from random import randint
 
 
@@ -100,6 +100,9 @@ def choice_to_cantidad_tickets(choice: str) -> int:
     if choice == '5': return 9999999
     return 0
 
+def check_info_creador_complete(creador: Creador) -> bool:
+    return creador.logo and creador.support_link and creador.user.username
+
 class Rifa(APIView):
     def post(self, request):
 
@@ -110,6 +113,9 @@ class Rifa(APIView):
         except Creador.DoesNotExist:
             return Response({'error': 'User is not a creator'}, status=400)
         
+        if not check_info_creador_complete(creador):
+            return Response({'error': 'Creador info is not complete'}, status=400)
+        
         data = request.data
         data['campania']['cantidad_tickets'] = choice_to_cantidad_tickets(data['campania']['cantidad_tickets'])
 
@@ -118,7 +124,6 @@ class Rifa(APIView):
 
         data: OrderedDict = serializer.validated_data
         campania:Campania = create_campania(data['campania'], creador)
-        print(campania)
         premios = data['premios']
         ofertas = data['ofertas']
 
@@ -281,58 +286,118 @@ class UserDashboard(APIView):
         except Creador.DoesNotExist:
             return JsonResponse(to_send)
         
+def create_reserva(campania: Campania, user) -> List[Reserva]:
+    """Create a reservation for a campaign and a user"""
+    NUMBER_OF_TRIES = 20
+    try_number = 0
+    while True:
+        try_number += 1
+        if try_number > NUMBER_OF_TRIES:
+            raise Exception('No hay suficientes tickets disponibles')
+        try: 
+            reserva : Reserva = Reserva.objects.create(
+                campania=campania,
+                usuario=user,
+                id_ticket=Reserva.objects.filter(campania=campania).count() + 1
+            )
+            
+            return reserva
+        except:
+            continue
+
+def precio_oferta(ofertas: List[Ofertas], cantidad: int, precio_ticket: float) -> float:
+    """Calculate the price based on the offers"""
+
+    precio = 0
+    ofertas.sort(reverse=True, key=lambda x: x.cada)
+
+    for oferta in ofertas:
+        aux = cantidad // oferta.cada
+        precio += aux * oferta.precio
+        cantidad -= aux * oferta.cada
+        if cantidad == 0:
+            break
+
+    precio += cantidad * precio_ticket if cantidad > 0 else 0
+    return precio
 
 
 class BuyTicket(APIView):
     def post(self, request):
         #TODO: TENER EN CUENTA LAS OFERTAS
+        # Check if the user is authenticated
         user = request.user
         if not user.is_authenticated:
             return Response({'error': 'User is not authenticated'}, status=400)
         
-
+        # Get the data from the request
         serializer = BuySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         campania_id = serializer.validated_data['campania']
         cantidad = serializer.validated_data['cantidad']
 
+        # Check if the campaign exists
         try:
             campania = Campania.objects.get(id=campania_id)
             id = campania.id
         except Campania.DoesNotExist:
             return Response({'error': 'Campaign does not exist'}, status=400)
         
+        # Check if the user has enough tickets
         try:
             campania.buyed_tickets = F('buyed_tickets') + cantidad
             campania.save()
-
         except Exception as e:
             return Response({'error': str(e)}, status=400)
-        reservas = []
-        for i in range(cantidad):
-            while True:
-                id = randint(0, campania.cantidad_tickets)
-                try:
-                    reserva : Reserva = Reserva.objects.create(
-                        campania=campania,
-                        usuario=user,
-                        id_ticket=id
-                    )
-                    reservas.append(reserva)
-                    break
-                except:
-                    continue
         
-        if len(reservas) != cantidad:
-            for reserva in reservas:
-                reserva.delete()
+        ofertas_query = Ofertas.objects.filter(campania=campania)
+        print(ofertas_query)
+        ofertas = list(ofertas_query)
+        print(ofertas)
+        
+        precio = precio_oferta(ofertas, cantidad, campania.precio_ticket)
+        
+        print(precio)
+        # TODO: Pasarela de pago
+
+        # Create the tickets
+
+        # Future improvement if we want to assign the tickets to the user randomly
+        # reservas = []
+        # for i in range(cantidad):
+        #     while True:
+        #         id = randint(0, campania.cantidad_tickets)
+        #         try:
+        #             reserva : Reserva = Reserva.objects.create(
+        #                 campania=campania,
+        #                 usuario=user,
+        #                 id_ticket=id
+        #             )
+        #             reservas.append(reserva)
+        #             break
+        #         except:
+        #             continue
+        try:
             
+            reservas : List[Reserva] = [
+                create_reserva(campania,user) for i in range(cantidad)
+            ]
+
+            # Check if the tickets were created correctly
+            if len(reservas) != cantidad:
+                raise Exception('No hay suficientes tickets disponibles')
+            
+        except Exception as e:
+            # Rollback the buyed tickets
+            map(lambda reserva: reserva.delete(), reservas)
             
             campania = Campania.objects.filter(id=id)
             campania.update(buyed_tickets=F('buyed_tickets') - cantidad)
-  
+            
+            
+            text = ', no hay suficientes tickets disponibles' if len(reservas) else ''
 
-            return Response({'error': 'Error al comprar los tickets'}, status=400)
+            return Response({'error': f'Error al comprar los tickets{text}'}, status=400)
 
         return Response({'message': 'Tickets comprados correctamente'}, status=200)

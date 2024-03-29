@@ -11,11 +11,4 @@ import CreateForm from '../../components/CreateForm';
 </Layout>
 
 <script>
-  import { $isCreador } from "../../store";
-
-  if (!$isCreador.get()){
-    window.location.href = "/login";
-    alert("Ha de ser creador para acceder a esta página.")
-    
-  }
 </script>

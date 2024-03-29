@@ -3,10 +3,12 @@ from rest_framework.views import APIView
 from .serializer import LoginSerializer, RegisterSerializer
 from django.contrib.auth import authenticate
 from core.models import Creador 
-from django.contrib.auth.models import UserManager
-from django.contrib.auth.models import User
+
+
+from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.tokens import RefreshToken
 
+User = get_user_model()
 
 class LoginAuthToken(APIView):
 
@@ -17,10 +19,10 @@ class LoginAuthToken(APIView):
         email = serializer.validated_data['email']
         password = serializer.validated_data['password']
         user = authenticate(username=email, password=password)
-        creador = Creador.objects.filter(user=user).first()
-
         if not user:
             return Response({'error': 'Invalid email or password'}, status=400)
+        
+        creador = Creador.objects.filter(user=user).first()
         refresh = RefreshToken.for_user(user=user)
         if not creador:
             creador_info = {
@@ -50,8 +52,12 @@ class Register(APIView):
 
         email = serializer.validated_data['email']
         password = serializer.validated_data['password']
-        provisional_username = email.split('@')[0]
-        user = User.objects.create_user(provisional_username,email=email, password=password)
+        username = serializer.validated_data['username']
+
+        if not email or not password or not username:
+            return Response({'error': 'Email, username and password are required'}, status=400)
+
+        user = User.objects.create_user(email=email, password=password, username=username)
 
         if not user:
             return Response({'error': 'Invalid email or password'}, status=400)

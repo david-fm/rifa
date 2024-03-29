@@ -56,11 +56,11 @@ export default function EditPerfil({serverURL}: Props) {
         console.log('change2');
         const [file] = logoInput.current.files;
         // Ahora puedes usar 'file'
-        console.log(file);
+        //console.log(file);
         const reader = new FileReader();
 
         reader.onload = (event) => {
-            console.log('load', event);
+            //console.log('load', event);
             if(img.current?.src && event.target?.result !== null)
             {
                 const value: string | ArrayBuffer | undefined = event.target?.result;
@@ -127,7 +127,9 @@ export default function EditPerfil({serverURL}: Props) {
         <div class="flex flex-col items-center justify-center w-96" ref={creador}>
             {
                 isCreador && (
-                <img src={serverURL + (creadorData.logo?creadorData.logo:"/defaultLogo.svg")} class="w-24 h-24 rounded-full cursor-pointer" id="img" ref={img} onClick={() =>logoInput.current?.click()}/>
+                    <div class="w-24 h-24 rounded-full cursor-pointer overflow-hidden flex items-center justify-center" onClick={() =>logoInput.current?.click()}>
+                    <img src={serverURL + (creadorData.logo?creadorData.logo:"/defaultLogo.svg")}  id="img" ref={img} />
+                    </div>
                 )
 
             }

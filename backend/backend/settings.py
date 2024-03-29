@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'django_resized',
     # Local
     'core',
+    'myauth',
 ]
 
 MIDDLEWARE = [
@@ -114,11 +115,11 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Custom user model
-AUTH_USER_MODEL = 'auth.User'
+AUTH_USER_MODEL = 'myauth.MyUser'
 
 # authenticate backend
 
-AUTHENTICATION_BACKENDS = ['auth.backend.EmailBackend']
+AUTHENTICATION_BACKENDS = ['myauth.backend.EmailBackend']
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/

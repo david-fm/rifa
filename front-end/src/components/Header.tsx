@@ -1,8 +1,9 @@
 import { useStore } from '@nanostores/preact'
 import { useRef } from 'preact/hooks';
 import { useEffect } from 'preact/hooks';
-import { $refreshToken, $token, $isCreador} from '@/store';
-import { logOut, logInRequired, delay } from '@/lib/functions';
+import { $refreshToken, $token, $isCreador, $alert} from '@/store';
+import { logOut, logInRequired, delay, fullInfoCreadorRequired } from '@/lib/functions';
+import Alert from './Alert';
 
 interface Props{
     icon: string;
@@ -13,9 +14,11 @@ export default function Header({icon}: Props){
     
     useEffect(() => {
         logInRequired();
+        fullInfoCreadorRequired();
     }, []);
     const accessToken = useStore($token);
     const refreshToken = useStore($refreshToken);
+    const alert = useStore($alert);
 
 
     const toggler = useRef<HTMLImageElement>(null);
@@ -52,6 +55,8 @@ export default function Header({icon}: Props){
     
     
     return(
+    <>
+    {alert && <Alert message={alert}/>}
     <header class={`w-full  mx-auto px-8 py-4 flex justify-center z-10 bg-fondo sticky ${accessToken && refreshToken ? "top-0": "" }`} ref={header}>
         <div class="w-full max-w-screen-xl relative">
             {
@@ -109,5 +114,6 @@ export default function Header({icon}: Props){
         
         
     </header>
+    </>
     )
 }
