@@ -227,6 +227,8 @@ class RifaDetail(APIView):
         data['reglamento'] = campania.reglamento
         data['premios'] = [premio.nombre for premio in premios]
         data['ofertas'] = [{'cada': oferta.cada, 'precio': oferta.precio} for oferta in ofertas]
+        ranking = campania.ranking(5)
+        data['ranking'] = list(map(lambda r: r['username'],ranking))
 
         data['link_soporte'] = creador.support_link
         data['username_soporte'] = creador.user.username

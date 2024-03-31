@@ -31,6 +31,7 @@ interface Rifa {
     reglamento: string;
     premios: [string];
     ofertas: [Ofertas];
+    ranking: [string];
 
     link_soporte: string;
     username_soporte: string;
@@ -45,10 +46,10 @@ async function getRifa(rifa_id: string | undefined): Promise<Rifa>{
 
         const response = await fetch(`${serverURL}api/rifas/${rifa_id}/`);
         const data = await response.json();
-
         return data;
     }
     catch(err){
+        //console.error(err);
         alert("Error al obtener la rifa");
         window.location.replace("/");
         return {} as Rifa;
@@ -68,6 +69,7 @@ export default function RifaView({rifa_id}:Props){
         info_ranking: "",
         reglamento: "",
         premios: [""],
+        ranking: [""],
         ofertas: [{precio: 0, cada: 0}],
         link_soporte: "",
         username_soporte: "",
@@ -79,6 +81,7 @@ export default function RifaView({rifa_id}:Props){
         $buying.set('');
         getRifa(rifa_id).then((res)=>{
             setData(res);
+            console.log(res);
         });
         
     },[]);
@@ -126,6 +129,16 @@ export default function RifaView({rifa_id}:Props){
                                 return <li>{premio}</li>
                             })}
                         </ul>
+                    </div>
+                    <div class="flex flex-col gap-3">
+                        <b>Ranking</b>
+                        <p>{data.info_ranking}</p>
+                        <p>Posiciones</p>
+                        <ol type="1" class=" list-decimal list-inside">
+                            {data.ranking?.map((ranking)=>{
+                                return <li class="list-inside list-item">{ranking}</li>
+                            })}
+                        </ol>
                     </div>
                     
                 </section>

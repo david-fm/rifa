@@ -18,6 +18,10 @@ const serverURL = import.meta.env.API;
                         <Input placeholder='Contraseña' type='password' extraClass='rounded-md' name='password' isRequiered/>
                     </div>
                     <div class="flex flex-col gap-1 items-center">
+                        <div class="flex justify-start items-center gap-4 mx-4" >
+                            <input type="checkbox" required id="politicas"/>
+                            <label>Acepto los <a href="" class="text-input-texto">Términos y condiciones</a></label>
+                        </div>
                         <p class="hidden text-input-texto" id="error"></p>
                         <p>No tienes una cuenta: <a href="register" class=" text-input-texto">Regístrate</a></p>
                         <Button type='submit' text='ENTRAR' extraClass='rounded-sm' client:load>
@@ -33,10 +37,11 @@ const serverURL = import.meta.env.API;
 <script>
 
 import {$token, $refreshToken, $isCreador, $baseUser, $creadorInfo, $timeToken, $buying} from '@/store.ts';
-import {forbiddenOnLoggedIn} from '@/lib/functions'
+import {forbiddenOnLoggedIn, mustAcceptPoliticas} from '@/lib/functions'
 
 forbiddenOnLoggedIn();
 
+const politicas = document.getElementById('politicas');
 const form = document.querySelector('form');
 const handleError = (err: any) => {
     const error = document.getElementById('error');
@@ -56,6 +61,8 @@ form?.addEventListener('submit', async (e) => {
         password: formData.get('password')
     }
     // send form data
+    if(!mustAcceptPoliticas(politicas))
+        return;
     const res = await fetch(form.action, {
         method: 'POST',
         body: JSON.stringify(toSend),

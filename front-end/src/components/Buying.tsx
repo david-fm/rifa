@@ -2,8 +2,8 @@ import Block from "./Block";
 import Button from "./Button";
 import { effect } from "@preact/signals";
 import { useSignal } from "@preact/signals";
-import { useEffect } from "preact/hooks";
-import { $buying, $token } from "@/store";
+import { useEffect, useRef } from "preact/hooks";
+import { $buying, $token, $alert } from "@/store";
 import { useStore } from "@nanostores/preact";
 
 const serverURL = import.meta.env.PUBLIC_API;
@@ -45,6 +45,7 @@ export default function Buying({precio_ticket, tickets_disponibles, loggedIn, ti
     const pagando = useSignal(false);
 
     const token = useStore($token);
+    const politicas = useRef<HTMLInputElement>(null);
     effect(()=>{comprados.value<0?comprados.value=0:null})
     
     
@@ -61,7 +62,12 @@ export default function Buying({precio_ticket, tickets_disponibles, loggedIn, ti
     ,[tickets_disponibles])
 
     function handlePagar(){
-
+        
+        if(!politicas.current?.checked)
+        {
+            $alert.set("Debes aceptar los términos y condiciones");
+            return;
+        }
         if(comprados.value>0)
         {
             if(loggedIn)
@@ -133,6 +139,11 @@ export default function Buying({precio_ticket, tickets_disponibles, loggedIn, ti
                 </div>
                 <div class="flex justify-between">
                 <p>Precio Total</p><p>{minPrize(precio_ticket,ofertas,comprados.value)}€</p>
+                
+                </div>
+                <div class="flex justify-start items-center gap-4">
+                    <input type="checkbox" ref={politicas}/>
+                    <label>Acepto los <a href="" class="text-input-texto">Términos y condiciones</a></label>
                 </div>
                 <Button text="PAGAR" type="button" extraClass="justify-center w-auto mt-5 mx-auto hover:-translate-y-3 hover:shadow-lg transition-all" onClick={handlePagar}/>
             </section>

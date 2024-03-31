@@ -63,3 +63,13 @@ export function findScroller(element) {
         findScroller(value);
     });
 }
+
+export const mustAcceptPoliticas = (politicas) => {
+  console.log(politicas);
+  console.log(politicas.checked);
+  if (!politicas.checked) {
+    $alert.set("Debes aceptar las políticas de privacidad para continuar");
+    return false;
+  }
+  return true;
+}
