@@ -10,7 +10,7 @@ const {id} = Astro.params;
 
 <Layout title="dashboard">
     
-    <RifaView rifa_id={id} client:load/>
+    <RifaView rifa_id={id} client:load client:only/>
     
 </Layout>
 

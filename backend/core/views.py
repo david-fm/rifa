@@ -97,7 +97,7 @@ def choice_to_cantidad_tickets(choice: str) -> int:
     if choice == '2': return 9999
     if choice == '3': return 99999
     if choice == '4': return 999999
-    if choice == '5': return 9999999
+    if choice == '5': return 4999999
     return 0
 
 def check_info_creador_complete(creador: Creador) -> bool:

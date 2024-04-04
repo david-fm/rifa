@@ -25,6 +25,7 @@ export default function CreateForm() {
     const signal = useSignal(0);
     const error = useSignal(false);
     const thersAFile = useSignal(false);
+    const isActiveRanking = useSignal(false);
 
     const toUpdate = useRef<HTMLImageElement>(null);
     const form = useRef<HTMLFormElement>(null);
@@ -64,15 +65,15 @@ export default function CreateForm() {
     }
 
     const info = [
-        (<Info title="Información general" text="Información general sobre la campaña, Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum debitis possimus corporis, id soluta iste voluptatibus nam itaque quaerat nisi!"/>),
+        (<Info title="Información general" text="Ingresa el nombre de la rifa, adjunta una imagen representativa y especifica el reglamento de la campaña."/>),
         (
-        <Info title="Ranking" text="Información sobre el ranking de la campaña, Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum debitis possimus corporis, id soluta iste voluptatibus nam itaque quaerat nisi!"/>),
+        <Info title="Ranking" text="Marca si el ranking está activo y describe los incentivos que ofrece."/>),
         (
-        <Info title="Tickets" text="Información sobre los tickets, Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum debitis possimus corporis, id soluta iste voluptatibus nam itaque quaerat nisi!"/>),
+        <Info title="Tickets" text="Selecciona la cantidad de tickets disponibles, establece su precio y especifica cuántos son necesarios para poder terminar la campaña."/>),
         (
-        <Info title="Descuentos" text="Información sobre los descuentos, Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum debitis possimus corporis, id soluta iste voluptatibus nam itaque quaerat nisi!"/>),
+        <Info title="Descuentos" text="Configure los descuentos ofrecidos, especificando la frecuencia y el precio de cada descuento. Ejemplo: cada "/>),
         (
-        <Info title="Premios" text="Información sobre los premios, Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum debitis possimus corporis, id soluta iste voluptatibus nam itaque quaerat nisi!"/>),
+        <Info title="Premios" text="Agregue los premios disponibles para los participantes de la rifa."/>),
 
     ]
     
@@ -189,9 +190,9 @@ export default function CreateForm() {
                 <div class={(signal.value==1?"flex flex-col gap-8 items-center":"hidden ")} id="container-1">
                     <div class="flex items-center justify-center gap-2 ">
                         <p class=" shrink-0">¿Esta activo?</p>
-                        <Input name='ranking_activo' type='checkbox' extraClass="w-auto campania" isRequiered/>
+                        <Input name='ranking_activo' type='checkbox' extraClass="w-auto campania" isRequiered myOnInput= {()=>isActiveRanking.value = !isActiveRanking.value}/>
                     </div>
-                    <Input extraClass="campania" placeholder='Incentivos en el ranking' name='info_ranking' big rows={5}  isRequiered/>
+                    <Input extraClass="campania" placeholder='Incentivos en el ranking' name='info_ranking' big rows={5}  {...(isActiveRanking.value?{isRequiered:true}:{})}/>
                 </div>
                 <div class={(signal.value==2?"flex flex-col gap-8 items-center":"hidden ")} id="container-2">
                     <Select form="crea-rifa" name="cantidad_tickets" extraClass="campania" isRequiered/>

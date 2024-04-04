@@ -2,10 +2,12 @@ import Buying from "@/components/Buying";
 import Image from "@/components/Image";
 import PercentageBar from "@/components/PercentageBar";
 import Perfil from "@/components/Perfil";
+import Alert from "@/components/Alert";
 
 import { $token, $refreshToken, $buying } from "@/store";
 import { useStore } from "@nanostores/preact";
 import { useState, useEffect } from "preact/hooks";
+import { copyTextToClipboard } from "@/lib/functions";
 
 const serverURL = import.meta.env.PUBLIC_API;
 
@@ -76,6 +78,7 @@ export default function RifaView({rifa_id}:Props){
         logo_soporte: ""
     }
     const [data, setData] = useState<Rifa>(INITIAL_RIFA);
+    const [isShering, setIsSharing] = useState(false);
 
     useEffect(()=>{
         $buying.set('');
@@ -90,15 +93,31 @@ export default function RifaView({rifa_id}:Props){
     const refreshToken = useStore($refreshToken);
 
     const loggedIn = token && refreshToken ? true : false;
+    const thisUrl = window.location.href;
+    const qrChart = `https://quickchart.io/qr?text=${thisUrl}`
 
     return (
+        <>
+        {isShering &&
+        <Alert onClose={()=>setIsSharing(false)}>
+            {/* Image that creates a QR code given the rifa_id */}
+            <div class="flex flex-col justify-center items-center">
+                <Image src={qrChart} alt="{data.nombre}" w="w-40" />
+                <p onClick={()=>copyTextToClipboard(thisUrl)} class="cursor-pointer">{thisUrl}</p>
+            </div>
+            
+        </Alert>
+        }
         <div class="h-full relative">
       
         <div class="flex justify-center items-center h-full px-8 lg:h-auto lg:pb-20">
             <div class="flex flex-col w-full max-w-screen-lg items-start h-full max-h-full lg:flex-row lg:items-center lg:gap-8 xl:gap-20 xl:max-w-screen-xl lg:h-auto relative">
                 <section class="pb-8 flex flex-col gap-8 border-barra border-b-2 w-full lg:border-none">
                     <div>
-                        <h1 class=" self-start">{data.nombre}</h1>
+                        <div class="flex justify-between items-center w-full">
+                            <h1 class="">{data.nombre}</h1>
+                            <p onClick={()=>setIsSharing(true)}>Compartir</p>
+                        </div>
                         <Image src={serverURL+data.foto} alt="{data.nombre}" w="w-full" />
                     </div>
                     
@@ -151,5 +170,6 @@ export default function RifaView({rifa_id}:Props){
             </div>
         </div>
     </div>
+    </>
     )
 }

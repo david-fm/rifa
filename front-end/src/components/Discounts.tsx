@@ -25,9 +25,9 @@ export default function Discounts() {
         <VaribleBlock manager={setNameChild}>
             <div class="grid grid-cols-2 grid-rows-2 gap-y-1 discount">
                 <label htmlFor={"cada"} class="flex items-center">Cada</label>
-                <Input placeholder="10" name={"cada"} extraClass="w-auto" isRequiered/>
+                <Input placeholder="10" name={"cada"} extraClass="w-auto" />
                 <label htmlFor={"precio"} class="flex items-center">Precio</label>
-                <Input placeholder="5" name={"precio"} extraClass="w-auto" isRequiered/>
+                <Input placeholder="5" name={"precio"} extraClass="w-auto" />
             </div>
         </VaribleBlock>
     )

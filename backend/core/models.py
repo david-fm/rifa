@@ -67,8 +67,8 @@ class Campania(TimeStampedModel, AbstractBaseModel):
     # if choice == 2: cantidad_tickets = 9999
     # if choice == 3: cantidad_tickets = 99999
     # if choice == 4: cantidad_tickets = 999999
-    # if choice == 5: cantidad_tickets = 9999999
-    cantidad_tickets = models.IntegerField(choices=[(99, "0"), (999,"1"), (9999,"2"), (99999,"3"), (999999,"4"), (9999999,"5")])
+    # if choice == 5: cantidad_tickets = 4999999
+    cantidad_tickets = models.IntegerField(choices=[(99, "0"), (999,"1"), (9999,"2"), (99999,"3"), (999999,"4"), (4999999,"5")])
     # The amount of tickets available
 
     tickets_necesarios = models.IntegerField()
@@ -85,6 +85,10 @@ class Campania(TimeStampedModel, AbstractBaseModel):
 
     buyed_tickets = models.IntegerField(blank=True, default=0)
 
+    has_end = models.BooleanField(blank=True, default=False)
+
+    has_winner = models.BooleanField(blank=True, default=False)
+
     class Meta:
         constraints = [
             CheckConstraint(
@@ -96,6 +100,11 @@ class Campania(TimeStampedModel, AbstractBaseModel):
                 # Test that the amount of tickets is greater than 0
                 check=Q(cantidad_tickets__gte=0),
                 name='campania_cantidad_no_negativa'
+            ),
+            CheckConstraint(
+                # Test that the amount of tickets is less than 5000000
+                check=Q(cantidad_tickets__lte=4999999),
+                name='campania_cantidad_menor_igual_5000000'
             ),
             CheckConstraint(
                 # Test that the amount of tickets needed is greater than 0
@@ -187,6 +196,29 @@ class Reserva(TimeStampedModel, AbstractBaseModel):
                 name='cantidad_no_negativa'
             )
         ]
+
+class Ganador(TimeStampedModel, AbstractBaseModel):
+    reserva = models.OneToOneField(Reserva, on_delete=models.CASCADE)
+
+@receiver(models.signals.pre_save, sender=Ganador)
+def check_winner(sender, instance, **kwargs):
+    """
+    Check that the campaign hasn't a winner and that the campaign has ended
+    """
+    if instance.reserva.campania.has_winner:
+        raise ValueError('The campaign already has a winner')
+    if not instance.reserva.campania.has_end:
+        raise ValueError('The campaign has not ended yet')
+
+@receiver(models.signals.post_save, sender=Ganador)
+def update_winner(sender, instance, **kwargs):
+    """
+    Update the campaign to have a winner
+    """
+    instance.reserva.campania.has_winner = True
+    instance.reserva.campania.save()
+
+
 
 # @receiver(models.signals.post_save, sender=Reserva)
 # def count_comprados(sender, instance:Reserva, **kwargs):
